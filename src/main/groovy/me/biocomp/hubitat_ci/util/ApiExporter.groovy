@@ -22,7 +22,7 @@ class PreprocessedClasses {
  * and to compare them with old ones.
  */
 class ApiExporter {
-    @CompileStatic
+    // @CompileStatic
     private static def loadAppExporterScript() {
         final def api = [log: new CapturingLog()] as AppExecutor
 
@@ -67,6 +67,13 @@ class ApiExporter {
                 result << mergeMaps(it as Map, overrides[className] as Map)
             } else {
                 result << it
+            }
+        }
+
+        // Add override-only classes that are not present in generated export (e.g., helper stubs).
+        overrides.each { className, overrideDef ->
+            if (!result.any { readClassName(it as Map) == className }) {
+                result << overrideDef
             }
         }
 

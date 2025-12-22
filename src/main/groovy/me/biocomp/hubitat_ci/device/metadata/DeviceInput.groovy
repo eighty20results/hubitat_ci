@@ -19,12 +19,19 @@ class DeviceInput extends InputCommon {
             [bool    : new BooleanInputValueFactory(),
              decimal : new NumberInputValueFactory(),
              email   : new TextInputValueFactory(),
-             enum    : new TextInputValueFactory(), // Todo: make enum input type?
+             enum    : new TextInputValueFactory(),
              number  : new NumberInputValueFactory(),
              password: new TextInputValueFactory(),
              phone   : new NumberInputValueFactory(),
              time    : new TextInputValueFactory(),
-             text    : new TextInputValueFactory()] as HashMap<String, IInputValueFactory>
+             text    : new TextInputValueFactory(),
+             paragraph: new TextInputValueFactory(),
+             date    : new TextInputValueFactory(),
+             textarea: new TextInputValueFactory(),
+             mode    : new TextInputValueFactory(),
+             hub     : new TextInputValueFactory()
+            ] as HashMap<String, IInputValueFactory>
+    // capability.* and device.* selectors treated structurally
 
     private static final NamedParametersValidator inputOptionsValidator = NamedParametersValidator.make {
         stringParameter("name", required(), canBeEmpty(), [Flags.DontValidateDeviceInputName])
@@ -38,13 +45,19 @@ class DeviceInput extends InputCommon {
                 'phone',
                 'time',
                 'text',
-                'paragraph' // TODO: verify if it's really supported
+                'paragraph',
+                'date',
+                'textarea',
+                'mode',
+                'hub'
         ])
         stringParameter("title", notRequired(), canBeEmpty())
         stringParameter("description", notRequired(), canBeEmpty())
         objParameter("defaultValue", notRequired(), canBeNull())
         boolParameter("required", notRequired())
         boolParameter("displayDuringSetup", notRequired())
+        boolParameter("multiple", notRequired())
+        boolParameter("submitOnChange", notRequired())
         numericRangeParameter("range", notRequired())
         listOfStringsParameter("options", notRequired())
     }
@@ -57,6 +70,11 @@ class DeviceInput extends InputCommon {
     boolean validateInputBasics()
     {
         if (!validationFlags.contains(Flags.DontValidatePreferences)) {
+            def typeValue = (options?.type ?: unnamedOptions?.type)
+            if (typeValue instanceof String && (typeValue.toLowerCase().startsWith('capability.') || typeValue.toLowerCase().startsWith('device.'))) {
+                return true
+            }
+
             inputOptionsValidator.validate(toString(),
                     unnamedOptions,
                     options,
@@ -64,6 +82,12 @@ class DeviceInput extends InputCommon {
                     validationFlags.contains(Flags.AllowMissingDeviceInputNameOrType) ? EnumSet.of(
                             NamedParametersValidator.ValidatorOption.IgnoreMissingMandatoryInputs) : EnumSet.noneOf(
                             NamedParametersValidator.ValidatorOption))
+
+            // enum requires options only in strict mode
+            if ((options?.type == 'enum' || unnamedOptions?.type == 'enum') && validationFlags.contains(Flags.StrictEnumInputValidation)) {
+                def opts = options?.options
+                assert (opts instanceof Collection && opts.size() > 0): "Input ${this} of type enum must provide options"
+            }
 
             return true
         }
@@ -73,6 +97,10 @@ class DeviceInput extends InputCommon {
 
     @Override
     IInputValueFactory typeNotFoundInTypeTable(String inputType) {
-        assert false: "Input ${this}'s type ${inputType} is not supported. Valid types are: ${validStaticInputTypes}"
+        if (inputType?.toLowerCase()?.startsWith('capability.') || inputType?.toLowerCase()?.startsWith('device.')) {
+            // Treat capability./device. selectors as text inputs; structural validation happens elsewhere.
+            return new TextInputValueFactory()
+        }
+        assert false: "Input ${this}'s type ${inputType} is not supported. Valid types are: ${validStaticInputTypes.keySet()} or capability./device. selectors"
     }
 }

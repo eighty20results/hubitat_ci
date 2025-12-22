@@ -1,6 +1,12 @@
 # Getting started
-1. [Install Gradle](https://gradle.org/install/) build system.
-2. Look at a [minimal project sample (for app)](https://github.com/biocomp/hubitat_ci_example/tree/master/minimal) as a basis, use your own script instead of  `appscript.groovy`.
-3. run `gradle build` from the same folder where `build.gradle` and your script are.
+1. Install JDK 11.
+2. Add `me.biocomp.hubitat_ci:hubitat_ci:<version, eg: 0.25.2>` to your test dependencies (see `hubitat_ci_setup.md`).
+3. Use `HubitatAppSandbox` or `HubitatDeviceSandbox` to load your script in tests (see `hubitat_ci_testing.md`).
+4. Run your tests locally via Gradle/Maven or groovy + @Grab.
+5. Optional: wire into CI (see `github_actions_snippet.yml`).
 
-This will build and run the test, which, in turn will load and validate your script.
+Existing in-depth docs:
+- `docs/hubitat_ci_overview.md`
+- `docs/hubitat_ci_setup.md`
+- `docs/hubitat_ci_testing.md`
+- `docs/hubitat_ci_example_homeconnect.md`

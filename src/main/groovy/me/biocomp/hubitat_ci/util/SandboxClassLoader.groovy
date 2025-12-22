@@ -116,6 +116,15 @@ class SandboxClassLoader extends ClassLoader {
             case ~/hubitat\.zigbee\..*/:
                 return name.replace('hubitat.zigbee', "${basePackageName}device_api.zigbee")
 
+            case 'hubitat.helper.ColorUtils':
+                return "${basePackageName}common_api.ColorUtils"
+            case 'hubitat.helper.HexUtils':
+                return "${basePackageName}common_api.HexUtils"
+            case 'hubitat.helper.RMUtils':
+                return "${basePackageName}common_api.RMUtils"
+            case 'hubitat.helper.ZigbeeUtils':
+                return "${basePackageName}common_api.ZigbeeUtils"
+
             default:
                 if (name.startsWith("hubitat")) {
                     return name.replace('hubitat.', "${basePackageName}")
@@ -126,4 +135,3 @@ class SandboxClassLoader extends ClassLoader {
         //return name.replaceAll('''hubitat[\\.$]device[\\.$]''', "me.biocomp.hubitat_ci.api.")
     }
 }
-

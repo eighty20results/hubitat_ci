@@ -170,11 +170,25 @@ class DeviceValidator extends
         assert duplicateCommands.size() == 0 : "Commands ${duplicateCommands} are duplicate, this is not useful."
     }
 
-    private static final HashMap<String, Class> supportedCommandArgumentTypes = ['number': Integer, 'string': String] as HashMap
+    private static final HashMap<String, Class> supportedCommandArgumentTypes = [
+            'number': Integer,
+            'string': String,
+            'decimal': BigDecimal,
+            'integer': Integer,
+            'long': Long,
+            'boolean': Boolean,
+            'date': Date,
+            'time': Date,
+            'json_object': Map,
+            'vector3': List,
+            'color_map': Map,
+            'enum': String
+    ] as HashMap
 
     private static Class parameterTypeToClass(Command command, String typeName) {
-        assert supportedCommandArgumentTypes.containsKey(typeName) : "${command}: Argument type '${typeName}' is not supported. Supported types are: ${supportedCommandArgumentTypes}"
-        return supportedCommandArgumentTypes.get(typeName)
+        def normalized = typeName?.toLowerCase()
+        assert supportedCommandArgumentTypes.containsKey(normalized) : "${command}: Argument type '${typeName}' is not supported. Supported types are: ${supportedCommandArgumentTypes.keySet()}"
+        return supportedCommandArgumentTypes.get(normalized)
     }
 
     @CompileStatic

@@ -106,7 +106,17 @@ enum Flags
      * 'enum' input type requires 'options' property with values.
      * This setting allows it to be null.
      */
-    AllowNullEnumInputOptions
+    AllowNullEnumInputOptions,
+
+    /**
+     * Allow legacy import whitelist instead of the strict forum/docs merge.
+     */
+    AllowLegacyImports,
+
+    /**
+     * Enforce strict enum input validation (options required, defaults checked). Off by default for legacy behavior.
+     */
+    StrictEnumInputValidation,
 
     /**
      * Helper to generate EnumSet<Flags> from variadic list of flags.
