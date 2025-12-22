@@ -36,5 +36,11 @@ Here's a build script file: [azure-pipelines.yml](azure-pipelines.yml).
 
 ## Documentation
 - [Getting started](docs/getting_started.md)
+- [Overview](docs/hubitat_ci_overview.md)
+- [Setup](docs/hubitat_ci_setup.md)
+- [Testing guide](docs/hubitat_ci_testing.md)
+- [Home Connect-style example](docs/hubitat_ci_example_homeconnect.md)
+- [GitHub Actions snippet (Gradle)](docs/github_actions_snippet.yml)
+- [GitHub Actions snippet (Maven)](docs/github_actions_snippet_maven.yml)
 - [How to test](docs/how_to_test.md): library usage and common mocking techniques
 - [Changelog](docs/changelog.md)
