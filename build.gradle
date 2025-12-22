@@ -24,7 +24,7 @@ publishing {
         maven(MavenPublication){
             groupId = System.getenv("MAVEN_GROUP_ID") ?: 'me.eighty20results.hubitat_ci'
             artifactId = System.getenv("MAVEN_ARTIFACT_ID") ?: 'hubitat_ci'
-            version = '0.26.1'
+            version = '0.26.2'
 
             from components.java
 
