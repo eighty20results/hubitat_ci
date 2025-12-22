@@ -114,7 +114,7 @@ class DeviceValidator extends
         assert attribute.name: "Attribute ${attribute} doesn't have a name."
         assert attribute.type: "Attribute ${attribute} doesn't have a type."
 
-        assert attribute.type == 'string' || attribute.type == 'enum' || attribute.type == 'number': "Attribute ${attribute}'s type '${attribute.type}' is not supported."
+        assert attribute.type == 'string' || attribute.type == 'enum' || attribute.type == 'number' || attribute.type == 'json_object': "Attribute ${attribute}'s type '${attribute.type}' is not supported."
         if (attribute.type == 'enum') {
             assert attribute.possibleValues != null && attribute.possibleValues.size() != 0: "Attribute ${attribute} with 'enum' type must have possible values specified."
         } else {
@@ -185,9 +185,34 @@ class DeviceValidator extends
             'enum': String
     ] as HashMap
 
-    private static Class parameterTypeToClass(Command command, String typeName) {
-        def normalized = typeName?.toLowerCase()
-        assert supportedCommandArgumentTypes.containsKey(normalized) : "${command}: Argument type '${typeName}' is not supported. Supported types are: ${supportedCommandArgumentTypes.keySet()}"
+    private static final Map<String, String> legacyCommandArgumentTypeAliases = [
+            'string': 'string',
+            'str': 'string',
+            'boolean': 'boolean', 'bool': 'boolean',
+            'int': 'integer', 'integer': 'integer',
+            'long': 'long',
+            'double': 'decimal', 'decimal': 'decimal', 'number': 'number',
+            'date': 'date', 'time': 'time',
+            'json_object': 'json_object', 'jsonobject': 'json_object', 'json': 'json_object',
+            'vector3': 'vector3', 'color_map': 'color_map', 'colormap': 'color_map',
+            'enum': 'enum'
+    ]
+
+    private static String normalizeCommandArgType(String raw) {
+        if (!raw) return raw
+        def lower = raw.toLowerCase()
+        return legacyCommandArgumentTypeAliases.get(lower, lower)
+    }
+
+    private static Class parameterTypeToClass(Command command, Object typeDef) {
+        String rawType = null
+        if (typeDef instanceof Map) {
+            rawType = typeDef.type ?: typeDef.dataType ?: typeDef.get("type")
+        } else {
+            rawType = typeDef?.toString()
+        }
+        def normalized = normalizeCommandArgType(rawType)
+        assert supportedCommandArgumentTypes.containsKey(normalized) : "${command}: Argument type '${typeDef}' is not supported. Supported types are: ${supportedCommandArgumentTypes.keySet()}"
         return supportedCommandArgumentTypes.get(normalized)
     }
 

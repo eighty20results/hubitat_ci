@@ -42,6 +42,7 @@ class HomeConnectSpec extends Specification {
         given:
         DeviceExecutor api = Mock() {
             _ * sendEvent(_ as Map) >> { args -> args[0] }
+            // parent calls are not modeled here; if your driver calls parent methods, mock them accordingly
         }
 
         def sandbox = new HubitatDeviceSandbox(new File("homeconnect_driver.groovy"))
@@ -70,4 +71,3 @@ If the real Home Connect driver calls Hubitat APIs not yet modeled (e.g., HTTP h
 - Dynamic metaprogramming and reflection are restricted; prefer explicit methods and mocks.
 - Time-sensitive code should rely on injected time or `TimeKeeper.now()` for determinism.
 - Network calls should be mocked; the sandbox does not automatically block I/O beyond the class whitelist.
-
