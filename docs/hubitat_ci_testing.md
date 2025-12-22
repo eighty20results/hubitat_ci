@@ -71,10 +71,38 @@ def script = new HubitatDeviceSandbox(new File("device_script.groovy")).run(
 
 ## Validation flags
 Selected flags (see `me.biocomp.hubitat_ci.validation.Flags` for full list):
-- `DontRunScript`: skip initialization.
-- `DontValidateDefinition`, `DontValidatePreferences`: skip specific checks.
-- `AllowNullEnumInputOptions`, `AllowNullListOptions`: relax input validation.
-- `DontRestrictGroovy`: disable AST restrictions (use sparingly; prefer adding whitelisted classes/expressions).
+- `Default`: baseline validation set.
+- `DontRunScript`: skip initialization/execute after compile.
+- `DontRestrictGroovy`: disable AST/groovy restriction checks (use sparingly).
+- `AllowNullListOptions`: allow null list options in inputs.
+- `AllowEmptyOptionValueStrings`: permit required option strings to be empty.
+
+**App-specific**
+- `DontValidateMetadata`, `DontValidatePreferences`, `DontValidateDefinition`, `DontValidateMappings`, `DontValidateCapabilities`, `DontValidateAttributes`: skip respective metadata/preferences/definition/mappings/capability/attribute validations.
+- `DontValidateSubscriptions`: skip subscribe() argument validation.
+- `AllowAnyDeviceAttributeOrCapabilityInSubscribe`: allow any attr/cap name in subscribe.
+- `AllowAnyExistingDeviceAttributeOrCapabilityInSubscribe`: allow any existing attr/cap in subscribe.
+- `AllowAnyAttributeEnumValuesInSubscribe`: allow any enum values in subscribe attribute filters.
+- `DontValidateDeviceInputName`: skip device input name checks.
+- `AllowWritingToSettings`: allow writing to settings during validation.
+- `AllowReadingNonInputSettings`: allow reads of settings not declared as inputs.
+- `AllowUnreachablePages`: allow pages not reachable from navigation.
+- `AllowTitleInPageCallingMethods`: allow title in page-calling methods.
+- `AllowMissingOAuthPage`: do not require OAuth page.
+- `AllowMissingInstall`: do not require at least one install:true page.
+
+**Driver-specific**
+- `AllowCommandDefinitionWithNoArgsMatchAnyCommandWithSameName`: allow commands without matching arg signatures.
+- `AllowSectionsInDevicePreferences`: allow section() inside driver preferences.
+- `AllowMissingCommandMethod`: skip requiring a backing method for command args.
+- `AllowMissingDeviceInputNameOrType`: allow missing name/type in device inputs.
+- `DontRequireCapabilityImplementationMethods`: allow missing capability methods.
+- `DontRequireParseMethodInDevice`: do not require parse().
+- `AllowNullEnumInputOptions`: allow enum inputs with null options.
+- `AllowLegacyImports`: use legacy import whitelist (pre forum/docs merge).
+- `StrictEnumInputValidation`: enforce strict enum input validation (options required, default checked). Off by default; enable to be stricter.
+
+Use `Flags.from(...)` or a list literal when passing to sandboxes, e.g. `.run(validationFlags: [Flags.DontRunScript, Flags.AllowLegacyImports])`.
 
 ## Common pitfalls
 - Platform APIs not modeled in `api.*` must be mocked or whitelisted; otherwise validation fails.
