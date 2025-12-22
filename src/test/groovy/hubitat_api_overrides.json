@@ -91,5 +91,25 @@
                 "name": "toArray"
             }
         ]
+    },
+    {
+        "class_name": "hubitat.helper.ColorUtils",
+        "options": ["generate_class"],
+        "methods": []
+    },
+    {
+        "class_name": "hubitat.helper.HexUtils",
+        "options": ["generate_class"],
+        "methods": []
+    },
+    {
+        "class_name": "hubitat.helper.RMUtils",
+        "options": ["generate_class"],
+        "methods": []
+    },
+    {
+        "class_name": "hubitat.helper.ZigbeeUtils",
+        "options": ["generate_class"],
+        "methods": []
     }
 ]

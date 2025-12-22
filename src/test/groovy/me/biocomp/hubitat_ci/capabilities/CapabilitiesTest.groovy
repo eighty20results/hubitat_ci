@@ -119,7 +119,11 @@ class CapabilitiesTest extends Specification
             new TestCapabilityInfo("waterSensor", "WaterSensor", "Water Sensor"),
             new TestCapabilityInfo("windowShade", "WindowShade", "Window Shade"),
             new TestCapabilityInfo("zwMultichannel", "ZwMultichannel", "Zw Multichannel"),
-            new TestCapabilityInfo("pHMeasurement", "pHMeasurement", "Ph Measurement")
+            new TestCapabilityInfo("pHMeasurement", "pHMeasurement", "Ph Measurement"),
+            new TestCapabilityInfo("airQuality", "AirQuality", "Air Quality"),
+            new TestCapabilityInfo("pM2_5", "PM2_5", "P M2_5"),
+            new TestCapabilityInfo("pM10", "PM10", "P M10"),
+            new TestCapabilityInfo("mediaPlayback", "MediaPlayback", "Media Playback")
     ]
 
     def "All device selector names are valid"()
@@ -154,4 +158,3 @@ class ThermostatCapabilityTest extends Specification
             Capabilities.readAttributes(Thermostat.class).keySet() == ["supportedThermostatFanModes", "supportedThermostatModes", "temperature", "coolingSetpoint", "thermostatFanMode", "heatingSetpoint", "thermostatMode", "thermostatOperatingState", "schedule", "thermostatSetpoint"] as Set
     }
 }
-

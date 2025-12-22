@@ -650,7 +650,7 @@ interface PowerMeter extends Capability, VoltageMeasurement
 interface PowerSource extends Capability
 {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
-        enumAttribute("powerSource", ["battery", "dc", "mains", "unknown"])
+        enumAttribute("powerSource", ["mains","battery","dc","unknown"])
     }
 }
 
@@ -671,11 +671,10 @@ interface PressureMeasurement extends Capability
     }
 }
 
-interface PushableButton extends Capability
-{
+interface PushableButton extends Capability {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
-        number("numberOfButtons")
         number("pushed")
+        number("numberOfButtons")
     }
 }
 
@@ -709,10 +708,10 @@ interface RelaySwitch extends Capability
 // Robot Cleaner Movement
 // Robot Cleaner Turbo Mode
 
-interface ReleasableButton extends Capability
-{
+interface ReleasableButton extends Capability {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
         number("released")
+        number("numberOfButtons")
     }
 }
 
@@ -1177,10 +1176,9 @@ interface VideoCamera extends Capability
 //    abstract void capture(Date a, Date b, Date c)
 //}
 
-interface VoltageMeasurement extends Capability
-{
-    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
-        number("voltage") // In Volt
+interface VoltageMeasurement extends Capability {
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList {
+        number("voltage")
     }
 }
 
@@ -1194,19 +1192,17 @@ interface WaterSensor extends Capability
     }
 }
 
-interface WindowShade extends Capability
-{
+interface WindowShade extends Capability {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
-        number("position", min: 0, max: 100)
-        enumAttribute("windowShade", [ "opening", "partially open", "closed", "open", "closing", "unknown"])
+        enumAttribute("windowShade", ["open","closed","partially open","opening","closing","unknown"])
+        number("position")
     }
-
-    @CompileStatic
-    abstract void close()
-
     @CompileStatic
     abstract void open()
-
+    @CompileStatic
+    abstract void close()
+    @CompileStatic
+    abstract void pause()
     @CompileStatic
     abstract void setPosition(Number position)
 }
@@ -1233,4 +1229,36 @@ interface PhMeasurement extends Capability
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
         number("PH")
     }
+}
+
+interface AirQuality extends Capability {
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList {
+        number("airQualityIndex")
+        number("pm25")
+        number("pm10")
+    }
+}
+
+interface PM2_5 extends Capability {
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
+        number("pm25")
+    }
+}
+
+interface PM10 extends Capability {
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
+        number("pm10")
+    }
+}
+
+interface MediaPlayback extends Capability {
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
+        enumAttribute("playbackStatus", ["stopped","playing","paused"])
+    }
+    @CompileStatic
+    abstract void play()
+    @CompileStatic
+    abstract void pause()
+    @CompileStatic
+    abstract void stop()
 }

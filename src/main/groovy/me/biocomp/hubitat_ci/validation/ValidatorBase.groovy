@@ -1,5 +1,10 @@
 package me.biocomp.hubitat_ci.validation
 
+import groovy.json.JsonSlurperClassic
+import groovy.sql.Sql
+import groovy.transform.Field
+import groovy.xml.StreamingMarkupBuilder
+import me.biocomp.hubitat_ci.api.common_api.ColorUtils
 import me.biocomp.hubitat_ci.util.AddValidationAfterEachMethodCompilationCustomizer
 import me.biocomp.hubitat_ci.util.DoNotCallMeBinding
 import me.biocomp.hubitat_ci.util.LoggingCompilationCustomizer
@@ -20,8 +25,16 @@ import org.codehaus.groovy.control.customizers.SecureASTCustomizer
 import org.codehaus.groovy.control.customizers.SourceAwareCustomizer
 import sun.util.calendar.ZoneInfo
 
+import java.security.MessageDigest
+import java.security.SecureRandom
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.regex.Pattern
 
 @TypeChecked
 class ValidatorBase {
@@ -42,6 +55,8 @@ class ValidatorBase {
              "getProducedDefinition", // Script's test-only use method
              "producedDefinition" // Script's test-only use property
             ] as HashSet
+
+    private final static Set<String> forumDocsAllowedImports = [] as HashSet
 
     private static HashSet<Class> classOriginalWhiteList = [java.lang.Object,
                                                             java.lang.Exception,
@@ -137,11 +152,33 @@ class ValidatorBase {
 
     ] as HashSet<Class>
 
+    private static HashSet<Class> forumDocsWhiteList = classOriginalWhiteList + ([
+            Field,
+            JsonSlurperClassic,
+            StreamingMarkupBuilder,
+            Sql,
+            MessageDigest,
+            SecureRandom,
+            ConcurrentHashMap,
+            ConcurrentLinkedQueue,
+            Pattern,
+            URL,
+            // java.time.* if permitted by Hubitat/runtime; add representative classes:
+            Instant,
+            Duration,
+            LocalDateTime,
+            // helper classes mapped via SandboxClassLoader (use their mapped names):
+            ColorUtils,
+            me.biocomp.hubitat_ci.api.common_api.HexUtils,
+            me.biocomp.hubitat_ci.api.common_api.RMUtils,
+            me.biocomp.hubitat_ci.api.common_api.ZigbeeUtils
+    ] as Collection<Class>) as HashSet<Class>
+
     private final HashSet<String> classNameWhiteList
     private final HashSet<String> forbiddenExpressions
 
-    static private HashSet<String> initClassNames(List<Class> extraAllowedClasses) {
-        return (classOriginalWhiteList + (extraAllowedClasses as HashSet)).collect { it.name } as HashSet;
+    static private HashSet<String> initClassNames(List<Class> extraAllowedClasses, HashSet<Class> baseWhitelist) {
+        return (baseWhitelist + (extraAllowedClasses as HashSet)).collect { it.name } as HashSet;
     }
 
     static private HashSet<String> initForbiddenExpressions(List<String> extraAllowedExpressions) {
@@ -154,7 +191,35 @@ class ValidatorBase {
             List<String> extraAllowedExpressions)
     {
         this.flags = setOfFlags
-        this.classNameWhiteList = initClassNames(extraAllowedClasses)
+        def baseWhitelist = flags.contains(Flags.AllowLegacyImports) ? classOriginalWhiteList : forumDocsWhiteList
+        this.classNameWhiteList = initClassNames(extraAllowedClasses, baseWhitelist)
+        if (!flags.contains(Flags.AllowLegacyImports)) {
+            // Accept raw helper imports before classloader mapping and other forum/docs imports by name
+            this.classNameWhiteList.addAll([
+                    'groovy.transform.Field',
+                    'groovy.json.JsonSlurperClassic',
+                    'groovy.xml.StreamingMarkupBuilder',
+                    'groovy.sql.Sql',
+                    'java.security.MessageDigest',
+                    'java.security.SecureRandom',
+                    'java.util.concurrent.ConcurrentHashMap',
+                    'java.util.concurrent.ConcurrentLinkedQueue',
+                    'java.util.regex.Pattern',
+                    'java.net.URL',
+                    'java.time.Instant',
+                    'java.time.Duration',
+                    'java.time.LocalDateTime',
+                    'hubitat.helper.interfaces.EventStream',
+                    'hubitat.helper.InterfaceHelper',
+                    'hubitat.helper.interfaces.Mqtt',
+                    'hubitat.helper.interfaces.RawSocket',
+                    'hubitat.helper.interfaces.WebSocket',
+                    'hubitat.helper.ColorUtils',
+                    'hubitat.helper.HexUtils',
+                    'hubitat.helper.RMUtils',
+                    'hubitat.helper.ZigbeeUtils'
+            ])
+        }
         this.forbiddenExpressions = initForbiddenExpressions(extraAllowedExpressions)
     }
 
