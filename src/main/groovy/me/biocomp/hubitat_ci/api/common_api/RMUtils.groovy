@@ -21,6 +21,6 @@
 package me.biocomp.hubitat_ci.api.common_api
 
 class RMUtils {
+    RMUtils() {}
     static Map<String,Object> getRule(String nameOrId) { throw new UnsupportedOperationException("Stub") }
 }
-

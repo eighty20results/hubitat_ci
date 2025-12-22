@@ -21,8 +21,8 @@
 package me.biocomp.hubitat_ci.api.common_api
 
 class ColorUtils {
+    ColorUtils() {}
     static Map<String, Object> colorTemperatureToRGB(Integer kelvin) { throw new UnsupportedOperationException("Stub") }
     static Map<String, Object> hexToRGB(String hex) { throw new UnsupportedOperationException("Stub") }
     static String rgbToHEX(Map rgb) { throw new UnsupportedOperationException("Stub") }
 }
-

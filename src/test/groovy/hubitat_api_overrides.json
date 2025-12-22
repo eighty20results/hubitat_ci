@@ -95,21 +95,36 @@
     {
         "class_name": "hubitat.helper.ColorUtils",
         "options": ["generate_class"],
-        "methods": []
+        "methods": [
+            {"returnType": "hubitat.helper.ColorUtils", "name": "ColorUtils", "parameters": [], "modifiers": ["constructor"]},
+            {"returnType": "java.util.Map", "name": "colorTemperatureToRGB", "parameters": ["java.lang.Integer"], "modifiers": ["static"]},
+            {"returnType": "java.util.Map", "name": "hexToRGB", "parameters": ["java.lang.String"], "modifiers": ["static"]},
+            {"returnType": "java.lang.String", "name": "rgbToHEX", "parameters": ["java.util.Map"], "modifiers": ["static"]}
+        ]
     },
     {
         "class_name": "hubitat.helper.HexUtils",
         "options": ["generate_class"],
-        "methods": []
+        "methods": [
+            {"returnType": "hubitat.helper.HexUtils", "name": "HexUtils", "parameters": [], "modifiers": ["constructor"]},
+            {"returnType": "java.lang.String", "name": "byteArrayToHexString", "parameters": ["byte[]"], "modifiers": ["static"]},
+            {"returnType": "byte[]", "name": "hexStringToByteArray", "parameters": ["java.lang.String"], "modifiers": ["static"]}
+        ]
     },
     {
         "class_name": "hubitat.helper.RMUtils",
         "options": ["generate_class"],
-        "methods": []
+        "methods": [
+            {"returnType": "hubitat.helper.RMUtils", "name": "RMUtils", "parameters": [], "modifiers": ["constructor"]},
+            {"returnType": "java.util.Map", "name": "getRule", "parameters": ["java.lang.String"], "modifiers": ["static"]}
+        ]
     },
     {
         "class_name": "hubitat.helper.ZigbeeUtils",
         "options": ["generate_class"],
-        "methods": []
+        "methods": [
+            {"returnType": "hubitat.helper.ZigbeeUtils", "name": "ZigbeeUtils", "parameters": [], "modifiers": ["constructor"]},
+            {"returnType": "java.util.Map", "name": "getAttributes", "parameters": ["java.lang.String"], "modifiers": ["static"]}
+        ]
     }
 ]

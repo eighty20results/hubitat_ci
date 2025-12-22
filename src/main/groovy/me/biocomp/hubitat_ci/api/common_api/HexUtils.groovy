@@ -21,7 +21,7 @@
 package me.biocomp.hubitat_ci.api.common_api
 
 class HexUtils {
+    HexUtils() {}
     static String byteArrayToHexString(byte[] bytes) { throw new UnsupportedOperationException("Stub") }
     static byte[] hexStringToByteArray(String hex) { throw new UnsupportedOperationException("Stub") }
 }
-
