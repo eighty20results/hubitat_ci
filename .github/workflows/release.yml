@@ -1,0 +1,73 @@
+name: Release Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_GROUP_ID: me.eighty20results.hubitat_ci
+      MAVEN_ARTIFACT_ID: hubitat_ci
+      MAVEN_ENDPOINT: https://maven.pkg.github.com/eighty20results/hubitat_ci
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+          cache: gradle
+
+      - name: Derive version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME:-${GITHUB_EVENT_RELEASE_TAG_NAME:-${{ github.event.release.tag_name }}}}"
+          TAG_NO_V=${TAG#v}
+          if [[ ! "$TAG_NO_V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Tag must be semver (X.Y.Z) optionally prefixed with v; got '$TAG'" >&2
+            exit 1
+          fi
+          FILE_VERSION=$(./gradlew properties -q | awk -F': ' '/^version:/ {print $2; exit}')
+          if [[ "$FILE_VERSION" != "$TAG_NO_V" ]]; then
+            echo "Tag version ($TAG_NO_V) does not match build.gradle version ($FILE_VERSION)" >&2
+            exit 1
+          fi
+          echo "version=$TAG_NO_V" >> $GITHUB_OUTPUT
+          echo "VERSION=$TAG_NO_V" >> $GITHUB_ENV
+
+      - name: Build and test
+        run: ./gradlew clean test --no-daemon --stacktrace
+
+      - name: Publish to GitHub Packages
+        env:
+          REPO_USERNAME: ${{ secrets.REPO_USERNAME }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+        run: |
+          if [[ -z "$REPO_USERNAME" || -z "$REPO_TOKEN" ]]; then
+            echo "Missing REPO_USERNAME or REPO_TOKEN" >&2
+            exit 1
+          fi
+          ./gradlew publish --no-daemon --stacktrace -PMAVEN_GROUP_ID="$MAVEN_GROUP_ID" -PMAVEN_ARTIFACT_ID="$MAVEN_ARTIFACT_ID" -PMAVEN_ENDPOINT="$MAVEN_ENDPOINT"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: hubitat_ci-artifacts
+          path: |
+            build/libs/hubitat_ci*.jar
+            build/libs/*-sources.jar
+            build/libs/*-groovydoc.jar
+
+      - name: Upload test reports on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            build/test-results/test
+            build/reports/tests/test
+
