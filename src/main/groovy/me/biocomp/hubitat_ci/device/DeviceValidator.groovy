@@ -217,7 +217,7 @@ class DeviceValidator extends
 
     @CompileStatic
     MetaMethod findMethodForCommand(MetaClass scriptMetaClass, String name, List<String> parameterTypes) {
-    // Locate a concrete script method matching the command name and normalized argument types; honor flags for arg-count mismatches.
+        // Locate a concrete script method matching the command name and normalized argument types; honor flags for arg-count mismatches.
         def command = new Command(name, parameterTypes, null)
 
         MetaMethod pickedMethod = scriptMetaClass.pickMethod(name,
