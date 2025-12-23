@@ -196,12 +196,14 @@ class DeviceValidator extends
     ]
 
     private static String normalizeCommandArgType(String raw) {
+        // Normalize legacy aliases and case differences into canonical type keys used for validation.
         if (!raw) return raw
         def lower = raw.toLowerCase()
         return legacyCommandArgumentTypeAliases.get(lower, lower)
     }
 
     private static Class parameterTypeToClass(Command command, Object typeDef) {
+        // Resolve a declared command argument type (string or map with type/dataType) to a concrete class, asserting support.
         String rawType = null
         if (typeDef instanceof Map) {
             rawType = typeDef.type ?: typeDef.dataType
@@ -214,8 +216,8 @@ class DeviceValidator extends
     }
 
     @CompileStatic
-    MetaMethod findMethodForCommand(MetaClass scriptMetaClass, String name, List<String> parameterTypes)
-    {
+    MetaMethod findMethodForCommand(MetaClass scriptMetaClass, String name, List<String> parameterTypes) {
+    // Locate a concrete script method matching the command name and normalized argument types; honor flags for arg-count mismatches.
         def command = new Command(name, parameterTypes, null)
 
         MetaMethod pickedMethod = scriptMetaClass.pickMethod(name,
@@ -230,6 +232,7 @@ class DeviceValidator extends
     }
 
     void validateCommand(Command command) {
+        // Ensure each declared command is backed by a method unless disabled via AllowMissingCommandMethod.
         if (!hasFlag(Flags.AllowMissingCommandMethod)) {
             assert command.method != null: "Command ${command} does not have a method with matching signature in current script."
         }
