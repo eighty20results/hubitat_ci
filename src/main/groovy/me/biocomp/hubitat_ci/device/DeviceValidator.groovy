@@ -186,16 +186,13 @@ class DeviceValidator extends
     ] as HashMap
 
     private static final Map<String, String> legacyCommandArgumentTypeAliases = [
-            'string': 'string',
             'str': 'string',
-            'boolean': 'boolean', 'bool': 'boolean',
-            'int': 'integer', 'integer': 'integer',
-            'long': 'long',
-            'double': 'decimal', 'decimal': 'decimal', 'number': 'number',
-            'date': 'date', 'time': 'time',
-            'json_object': 'json_object', 'jsonobject': 'json_object', 'json': 'json_object',
-            'vector3': 'vector3', 'color_map': 'color_map', 'colormap': 'color_map',
-            'enum': 'enum'
+            'bool': 'boolean',
+            'int': 'integer',
+            'double': 'decimal',
+            'jsonobject': 'json_object',
+            'json': 'json_object',
+            'colormap': 'color_map',
     ]
 
     private static String normalizeCommandArgType(String raw) {
@@ -207,7 +204,7 @@ class DeviceValidator extends
     private static Class parameterTypeToClass(Command command, Object typeDef) {
         String rawType = null
         if (typeDef instanceof Map) {
-            rawType = typeDef.type ?: typeDef.dataType ?: typeDef.get("type")
+            rawType = typeDef.type ?: typeDef.dataType
         } else {
             rawType = typeDef?.toString()
         }
