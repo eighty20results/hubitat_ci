@@ -110,7 +110,7 @@ def parse(String s) { }
         'empty map'                | [:]
         'missing type/dataType'    | [foo: 'bar']
         'unsupported type value'   | [type: 'bad']
-        'unsupported dataType key' | [dataType: 'bad']
+        'unsupported dataType value' | [dataType: 'bad']
     }
 
     @Unroll
