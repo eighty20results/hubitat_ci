@@ -69,21 +69,14 @@ jobs:
         run: |
           set -euo pipefail
           missing=()
-          paths=(
-            "SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-tankless-app.groovy"
-            "SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-thermostat-app.groovy"
-            "SubmodulesWithScripts/Hubitat/Drivers/fibaro-double-switch-2-fgs-223.src/fibaro-double-switch-2-fgs-223.groovy"
-            "SubmodulesWithScripts/homeremote/hubitatapp"
-            "SubmodulesWithScripts/homebridge-hubitat-tonesto7/smartapps/tonesto7/homebridge-hubitat.src/homebridge-hubitat.groovy"
-            "SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy"
-            "SubmodulesWithScripts/konnected/hubitat/apps/konnected-connect.groovy"
-            "SubmodulesWithScripts/influxdb_logger/influxdb-logger.groovy"
-          )
-          for p in "${paths[@]}"; do
+          # Read paths from shared config file, ignoring comments and empty lines
+          while IFS= read -r p || [[ -n "$p" ]]; do
+            # Skip empty lines and comments
+            [[ -z "$p" || "$p" =~ ^[[:space:]]*# ]] && continue
             if [[ ! -e "$p" ]]; then
               missing+=("$p")
             fi
-          done
+          done < .submodule-fixtures.txt
           if (( ${#missing[@]} > 0 )); then
             echo "Missing required submodule fixtures:" >&2
             printf ' - %s\n' "${missing[@]}" >&2
