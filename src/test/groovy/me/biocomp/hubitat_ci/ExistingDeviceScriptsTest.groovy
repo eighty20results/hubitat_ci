@@ -25,9 +25,17 @@ class WeatherDisplayScriptTest extends
 class Fibaro223ScriptTest extends Specification
 {
     @Shared
-    static final List<File> REQUIRED_SUBMODULE_FILES = [
-            new File("SubmodulesWithScripts/Hubitat/Drivers/fibaro-double-switch-2-fgs-223.src/fibaro-double-switch-2-fgs-223.groovy"),
-    ]
+    static final List<File> REQUIRED_SUBMODULE_FILES = loadSubmoduleFixtures()
+
+    static List<File> loadSubmoduleFixtures() {
+        def configFile = new File(".submodule-fixtures.txt")
+        if (!configFile.exists()) {
+            throw new FileNotFoundException("Configuration file .submodule-fixtures.txt not found")
+        }
+        return configFile.readLines()
+            .findAll { line -> line && !line.trim().startsWith('#') }
+            .collect { new File(it.trim()) }
+    }
 
     def setupSpec() {
         def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
