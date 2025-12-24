@@ -4,7 +4,8 @@ plugins {
 }
 
 // Allow overriding version via -Pversion or VERSION env; fallback to default
-version = project.findProperty('version') ?: System.getenv('VERSION') ?: '0.26.3'
+def versionProperty = project.findProperty('version')
+version = (versionProperty != null && versionProperty != 'unspecified') ? versionProperty : (System.getenv('VERSION') ?: '0.26.3')
 
 repositories {
     mavenCentral()
