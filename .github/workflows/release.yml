@@ -28,6 +28,9 @@ jobs:
       - name: Derive version from tag
         id: version
         run: |
+          set -e
+          set -o pipefail
+          
           TAG="${GITHUB_REF_NAME:-${{ github.event.release.tag_name }}}"
           TAG_NO_V=${TAG#v}
           if [[ ! "$TAG_NO_V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
@@ -36,8 +39,22 @@ jobs:
           fi
           # Set VERSION env var first so gradlew can use it
           export VERSION="$TAG_NO_V"
-          # Now validate that gradlew picks up the VERSION we set
-          FILE_VERSION=$(./gradlew properties -q | awk -F': ' '/^version:/ {print $2; exit}')
+          
+          # Run gradlew and capture output with error handling
+          if ! GRADLE_OUTPUT=$(./gradlew properties -q 2>&1); then
+            echo "Error: gradlew properties command failed" >&2
+            echo "$GRADLE_OUTPUT" >&2
+            exit 1
+          fi
+          
+          # Extract version and validate it's not empty
+          FILE_VERSION=$(echo "$GRADLE_OUTPUT" | awk -F': ' '/^version:/ {print $2; exit}')
+          if [[ -z "$FILE_VERSION" ]]; then
+            echo "Error: Could not extract version from gradlew properties output" >&2
+            exit 1
+          fi
+          
+          # Validate version matches tag
           if [[ "$FILE_VERSION" != "$TAG_NO_V" ]]; then
             echo "Tag version ($TAG_NO_V) does not match build.gradle version ($FILE_VERSION)" >&2
             exit 1
