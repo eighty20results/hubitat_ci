@@ -142,12 +142,6 @@ class IComfortAppScriptTest extends
     @Shared
     static final List<File> REQUIRED_SUBMODULE_FILES = [
             new File("SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy"),
-            new File("SubmodulesWithScripts/konnected/hubitat/apps/konnected-connect.groovy"),
-            new File("SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-thermostat-app.groovy"),
-            new File("SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-tankless-app.groovy"),
-            new File("SubmodulesWithScripts/homeremote/hubitatapp"),
-            new File("SubmodulesWithScripts/homebridge-hubitat-tonesto7/smartapps/tonesto7/homebridge-hubitat.src/homebridge-hubitat.groovy"),
-            new File("SubmodulesWithScripts/influxdb_logger/influxdb-logger.groovy"),
     ]
 
     def setupSpec() {
