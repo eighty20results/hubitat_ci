@@ -153,7 +153,7 @@ class IComfortAppScriptTest extends
     def setupSpec() {
         def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
         if (!missing.isEmpty()) {
-            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. Run 'git submodule update --init --recursive'.")
+            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. For local development, run 'git submodule update --init --recursive'. If running in CI, ensure the checkout action includes 'submodules: recursive'.")
         }
     }
 
