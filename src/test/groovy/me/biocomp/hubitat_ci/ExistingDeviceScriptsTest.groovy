@@ -4,6 +4,7 @@ import me.biocomp.hubitat_ci.api.common_api.Log
 import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
 import me.biocomp.hubitat_ci.validation.Flags
+import spock.lang.Shared
 import spock.lang.Specification
 
 class WeatherDisplayScriptTest extends
@@ -23,6 +24,18 @@ class WeatherDisplayScriptTest extends
 
 class Fibaro223SciptTest extends Specification
 {
+    @Shared
+    static final List<File> REQUIRED_SUBMODULE_FILES = [
+            new File("SubmodulesWithScripts/Hubitat/Drivers/fibaro-double-switch-2-fgs-223.src/fibaro-double-switch-2-fgs-223.groovy"),
+    ]
+
+    def setupSpec() {
+        def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
+        if (!missing.isEmpty()) {
+            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. Run 'git submodule update --init --recursive'.")
+        }
+    }
+
     HubitatDeviceSandbox sandbox = new HubitatDeviceSandbox(new File("SubmodulesWithScripts/Hubitat/Drivers/fibaro-double-switch-2-fgs-223.src/fibaro-double-switch-2-fgs-223.groovy"))
 
     def "Basic validation"() {
