@@ -22,7 +22,7 @@ class WeatherDisplayScriptTest extends
     }
 }
 
-class Fibaro223SciptTest extends Specification
+class Fibaro223ScriptTest extends Specification
 {
     @Shared
     static final List<File> REQUIRED_SUBMODULE_FILES = [
