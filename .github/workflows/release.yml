@@ -8,9 +8,9 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     env:
-      MAVEN_GROUP_ID: me.eighty20results.hubitat_ci
+      MAVEN_GROUP_ID: me.${{ github.actor }}.hubitat_ci
       MAVEN_ARTIFACT_ID: hubitat_ci
-      MAVEN_ENDPOINT: https://maven.pkg.github.com/eighty20results/hubitat_ci
+      MAVEN_ENDPOINT: https://maven.pkg.github.com/${{ github.actor }}/hubitat_ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,7 +25,7 @@ jobs:
       - name: Derive version from tag
         id: version
         run: |
-          TAG="${GITHUB_REF_NAME:-${GITHUB_EVENT_RELEASE_TAG_NAME:-${{ github.event.release.tag_name }}}}"
+          TAG="${GITHUB_REF_NAME:-${{ github.event.release.tag_name }}}"
           TAG_NO_V=${TAG#v}
           if [[ ! "$TAG_NO_V" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Tag must be semver (X.Y.Z) optionally prefixed with v; got '$TAG'" >&2
@@ -44,8 +44,8 @@ jobs:
 
       - name: Publish to GitHub Packages
         env:
-          REPO_USERNAME: ${{ secrets.REPO_USERNAME }}
-          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          REPO_USERNAME: ${{ github.actor }}
+          REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [[ -z "$REPO_USERNAME" || -z "$REPO_TOKEN" ]]; then
             echo "Missing REPO_USERNAME or REPO_TOKEN" >&2
