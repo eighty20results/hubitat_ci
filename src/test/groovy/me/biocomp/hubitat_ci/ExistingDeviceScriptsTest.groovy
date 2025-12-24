@@ -3,6 +3,7 @@ package me.biocomp.hubitat_ci
 import me.biocomp.hubitat_ci.api.common_api.Log
 import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
+import me.biocomp.hubitat_ci.util.SubmoduleFixtureLoader
 import me.biocomp.hubitat_ci.validation.Flags
 import spock.lang.Shared
 import spock.lang.Specification
@@ -25,17 +26,7 @@ class WeatherDisplayScriptTest extends
 class Fibaro223ScriptTest extends Specification
 {
     @Shared
-    static final List<File> REQUIRED_SUBMODULE_FILES = loadSubmoduleFixtures()
-
-    static List<File> loadSubmoduleFixtures() {
-        def configFile = new File(".submodule-fixtures.txt")
-        if (!configFile.exists()) {
-            throw new FileNotFoundException("Configuration file .submodule-fixtures.txt not found")
-        }
-        return configFile.readLines()
-            .findAll { line -> line && !line.trim().startsWith('#') }
-            .collect { new File(it.trim()) }
-    }
+    static final List<File> REQUIRED_SUBMODULE_FILES = SubmoduleFixtureLoader.loadSubmoduleFixtures()
 
     def setupSpec() {
         def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
