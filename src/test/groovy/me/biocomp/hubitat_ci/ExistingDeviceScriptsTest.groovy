@@ -32,7 +32,7 @@ class Fibaro223SciptTest extends Specification
     def setupSpec() {
         def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
         if (!missing.isEmpty()) {
-            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. Run 'git submodule update --init --recursive'.")
+            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. For local development, run 'git submodule update --init --recursive'. If running in CI, ensure your checkout step fetches submodules recursively (for example, by using 'submodules: recursive' with actions/checkout).")
         }
     }
 
