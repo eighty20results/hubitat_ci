@@ -9,6 +9,7 @@ import me.biocomp.hubitat_ci.api.common_api.Log
 import me.biocomp.hubitat_ci.app.AppValidator
 import me.biocomp.hubitat_ci.app.HubitatAppSandbox
 import me.biocomp.hubitat_ci.validation.Flags
+import spock.lang.Shared
 import spock.lang.Specification
 
 class AppTemplateScriptTest extends
@@ -138,6 +139,24 @@ class ThermostatDimerSyncHelperTest extends
 class IComfortAppScriptTest extends
         Specification
 {
+    @Shared
+    static final List<File> REQUIRED_SUBMODULE_FILES = [
+            new File("SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy"),
+            new File("SubmodulesWithScripts/konnected/hubitat/apps/konnected-connect.groovy"),
+            new File("SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-thermostat-app.groovy"),
+            new File("SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-tankless-app.groovy"),
+            new File("SubmodulesWithScripts/homeremote/hubitatapp"),
+            new File("SubmodulesWithScripts/homebridge-hubitat-tonesto7/smartapps/tonesto7/homebridge-hubitat.src/homebridge-hubitat.groovy"),
+            new File("SubmodulesWithScripts/influxdb_logger/influxdb-logger.groovy"),
+    ]
+
+    def setupSpec() {
+        def missing = REQUIRED_SUBMODULE_FILES.findAll { !it.exists() }
+        if (!missing.isEmpty()) {
+            throw new FileNotFoundException("Missing required submodule fixtures: ${missing.join(', ')}. Run 'git submodule update --init --recursive'.")
+        }
+    }
+
     def sandbox = new HubitatAppSandbox(new File("SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy"))
 
     def "Basic validation"() {

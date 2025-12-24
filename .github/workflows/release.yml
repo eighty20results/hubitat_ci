@@ -17,6 +17,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
 
       - name: Set up JDK 11
         uses: actions/setup-java@v4
@@ -61,6 +64,32 @@ jobs:
           fi
           echo "version=$TAG_NO_V" >> $GITHUB_OUTPUT
           echo "VERSION=$TAG_NO_V" >> $GITHUB_ENV
+
+      - name: Verify submodule fixtures
+        run: |
+          set -euo pipefail
+          missing=()
+          paths=(
+            "SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-tankless-app.groovy"
+            "SubmodulesWithScripts/EcoNet/Hubitat/SmartApps/econet-thermostat-app.groovy"
+            "SubmodulesWithScripts/Hubitat/Drivers/fibaro-double-switch-2-fgs-223.src/fibaro-double-switch-2-fgs-223.groovy"
+            "SubmodulesWithScripts/homeremote/hubitatapp"
+            "SubmodulesWithScripts/homebridge-hubitat-tonesto7/smartapps/tonesto7/homebridge-hubitat.src/homebridge-hubitat.groovy"
+            "SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy"
+            "SubmodulesWithScripts/konnected/hubitat/apps/konnected-connect.groovy"
+            "SubmodulesWithScripts/influxdb_logger/influxdb-logger.groovy"
+          )
+          for p in "${paths[@]}"; do
+            if [[ ! -e "$p" ]]; then
+              missing+=("$p")
+            fi
+          done
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required submodule fixtures:" >&2
+            printf ' - %s\n' "${missing[@]}" >&2
+            echo "Ensure submodules are fetched (git submodule update --init --recursive)." >&2
+            exit 1
+          fi
 
       - name: Build and test
         run: ./gradlew clean test --no-daemon --stacktrace
