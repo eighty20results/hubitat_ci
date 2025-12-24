@@ -11,9 +11,9 @@ jobs:
       contents: read
       packages: write
     env:
-      MAVEN_GROUP_ID: me.${{ github.actor }}.hubitat_ci
+      MAVEN_GROUP_ID: me.${{ github.repository_owner }}.hubitat_ci
       MAVEN_ARTIFACT_ID: hubitat_ci
-      MAVEN_ENDPOINT: https://maven.pkg.github.com/${{ github.actor }}/hubitat_ci
+      MAVEN_ENDPOINT: https://maven.pkg.github.com/${{ github.repository_owner }}/hubitat_ci
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,10 +53,6 @@ jobs:
           REPO_USERNAME: ${{ github.actor }}
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [[ -z "$REPO_USERNAME" || -z "$REPO_TOKEN" ]]; then
-            echo "Missing REPO_USERNAME or REPO_TOKEN" >&2
-            exit 1
-          fi
           ./gradlew publish --no-daemon --stacktrace
 
       - name: Upload artifacts
