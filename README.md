@@ -1,6 +1,6 @@
-# Hubitat CI
+# Hubitat CI (Forked from biocomp/hubitat_ci)
 
-[![Build Status](https://biocomp.visualstudio.com/HubitatCiRelease/_apis/build/status/hubitat_ci%20build?branchName=master)](https://biocomp.visualstudio.com/HubitatCiRelease/_build/latest?definitionId=13&branchName=master)
+[![Release Publish](https://github.com/eighty20results/hubitat_ci/actions/workflows/release.yml/badge.svg)](https://github.com/eighty20results/hubitat_ci/actions/workflows/release.yml)
 
 This library allows testing of Hubitat scripts locally on your machine (and via **C**ontinuous **I**ntegration, thus Hubitat CI).
 
