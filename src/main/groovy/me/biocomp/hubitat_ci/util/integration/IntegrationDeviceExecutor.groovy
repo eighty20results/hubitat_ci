@@ -65,6 +65,11 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
      * END SECTION: Select methods from DeviceExecutor trait
      *****************************************************************/
 
+    @Override
+    def parseJson(String json) {
+        new groovy.json.JsonSlurper().parseText(json)
+    }
+
     void setSubscribingScript(HubitatDeviceScript script) {
         this.scheduler?.setHandlingObject(script)
     }

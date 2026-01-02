@@ -7,7 +7,7 @@ import java.lang.reflect.Method
 @CompileStatic
 class ScriptUtil {
 
-    static def handleGetProperty(String property, def scriptObject, Map userSettingsMap)
+    static def handleGetProperty(String property, def scriptObject, Map userSettingsMap, Map globals = null)
     {
         switch (property) {
             case "metaClass":
@@ -23,6 +23,11 @@ class ScriptUtil {
             return getter.invoke(scriptObject);
         } catch (NoSuchMethodException e) {
             // It's OK, it might be handled below
+        }
+
+        // Allow explicit globals to mimic hub parent/child wiring
+        if (globals != null && globals.containsKey(property)) {
+            return globals.get(property)
         }
 
         final def scriptMetaClass = scriptObject.getMetaClass()

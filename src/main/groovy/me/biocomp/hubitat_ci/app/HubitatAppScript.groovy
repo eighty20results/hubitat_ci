@@ -1,6 +1,8 @@
 package me.biocomp.hubitat_ci.app
 
 import me.biocomp.hubitat_ci.api.app_api.AppExecutor
+import me.biocomp.hubitat_ci.api.common_api.ChildDeviceWrapper
+import me.biocomp.hubitat_ci.api.common_api.InstalledAppWrapper
 import me.biocomp.hubitat_ci.app.preferences.AppPreferencesReader
 import me.biocomp.hubitat_ci.app.preferences.Preferences
 import groovy.transform.CompileStatic
@@ -23,12 +25,17 @@ abstract class HubitatAppScript extends
     private AppSubscriptionReader subscriptionReader = null
     final private List<Closure> validateAfterRun = []
     private AppValidator validator = null
-    private final AppData data = new AppData()
+    private AppData data = new AppData()
+    private Closure childDeviceFactory
+    private Closure childAppFactory
+    private Closure childAppAccessor
 
     private final HashSet<String> existingMethods = InitExistingMethods()
 
     @Delegate
     private AppExecutor api = null
+
+    private Object parent
 
     @CompileStatic
     private static HashSet<String> InitExistingMethods() {
@@ -37,7 +44,7 @@ abstract class HubitatAppScript extends
 
     @TypeChecked
     @CompileStatic
-    void initialize(HubitatAppScript parent) {
+    void initializeFromParent(HubitatAppScript parent) {
         this.api = parent.@api
         this.preferencesReader = parent.@preferencesReader
         this.definitionReader = parent.@definitionReader
@@ -54,13 +61,22 @@ abstract class HubitatAppScript extends
     }
 
     @CompileStatic
-    void initialize(
+    void initializeScript(
             AppExecutor api,
             AppValidator validator,
             Map userSettingValues,
-            Closure customizeScriptBeforeRun)
+            Closure customizeScriptBeforeRun,
+            Closure childDeviceFactory,
+            Closure childAppFactory,
+            Object parent,
+            Closure childAppAccessor = null)
     {
         customizeScriptBeforeRun?.call(this)
+
+        this.childDeviceFactory = childDeviceFactory
+        this.childAppFactory = childAppFactory
+        this.childAppAccessor = childAppAccessor
+        this.parent = parent
 
         // This guy needs to be first - it checks if its api is null,
         // and then does nothing in subscribe().
@@ -125,6 +141,75 @@ abstract class HubitatAppScript extends
         return mappingsReader
     }
 
+    ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Long hubId, Map options) {
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        return childDeviceFactory(namespace, typeName, deviceNetworkId, hubId, options)
+    }
+
+    ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId) {
+        return addChildDevice(namespace, typeName, deviceNetworkId, null, [:])
+    }
+
+    void deleteChildDevice(String deviceNetworkId) {
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        childDeviceFactory.call('delete', deviceNetworkId)
+    }
+
+    List getChildDevices() {
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        return childDeviceFactory.call('list') as List
+    }
+
+    ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        return childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+    }
+
+    List getAllChildDevices() {
+        return getChildDevices()
+    }
+
+    InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {
+        assert childAppFactory != null: "Child app factory is not configured"
+        return childAppFactory(namespace, smartAppVersionName, label, properties)
+    }
+
+    InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label) {
+        return (InstalledAppWrapper)addChildApp(namespace, smartAppVersionName, label, [:])
+    }
+
+    Object getChildApps() {
+        assert childAppAccessor != null: "Child app accessor is not configured"
+        return childAppAccessor('list')
+    }
+
+    Object getChildAppById(Long id) {
+        assert childAppAccessor != null: "Child app accessor is not configured"
+        return childAppAccessor('get', id)
+    }
+
+    Object getAllChildApps() {
+        return getChildApps()
+    }
+
+    Object getChildAppByLabel(String label) {
+        assert childAppAccessor != null: "Child app accessor is not configured"
+        return childAppAccessor('getByLabel', label)
+    }
+
+    void deleteChildApp(Long id) {
+        assert childAppAccessor != null: "Child app accessor is not configured"
+        childAppAccessor('delete', id)
+    }
+
+    InstalledAppWrapper getParent() {
+        return this.parent as InstalledAppWrapper
+    }
+
+    void setParent(Object parent) {
+        this.parent = parent
+    }
+
     /*
         Don't let Script base class to redirect properties to binding,
             it causes confusing issues when using non-supported methods and properties.
@@ -140,6 +225,13 @@ abstract class HubitatAppScript extends
             case "params":
                 if (this.@injectedMappingHandlerData != null) {
                     return this.@injectedMappingHandlerData['params']
+                }
+
+                break;
+
+            case "parent":
+                if (this.@parent != null) {
+                    return this.@parent
                 }
 
                 break;

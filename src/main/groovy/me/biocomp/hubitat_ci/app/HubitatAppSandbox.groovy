@@ -9,6 +9,13 @@ import me.biocomp.hubitat_ci.validation.NamedParametersValidator
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
+import me.biocomp.hubitat_ci.app.child.AppChildExecutor
+import me.biocomp.hubitat_ci.app.child.ChildAppRegistry
+import me.biocomp.hubitat_ci.app.child.InstalledAppWrapperImpl
+import me.biocomp.hubitat_ci.device.child.ChildDeviceRegistry
+import me.biocomp.hubitat_ci.device.child.ChildDeviceWrapperImpl
+import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
+import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
 
 /**
  * This sandbox can load script from file or string,
@@ -66,18 +73,125 @@ class HubitatAppSandbox {
         setupImpl(options).getProducedPreferences()
     }
 
+    @TypeChecked(TypeCheckingMode.SKIP)
     private HubitatAppScript setupImpl(Map options) {
         validateAndUpdateSandboxOptions(options)
 
         def validator = readValidator(options)
 
+        // Per-sandbox registries and ID generation
+        def childDeviceRegistry = new ChildDeviceRegistry()
+        def childAppRegistry = new ChildAppRegistry()
+
+        InstalledAppWrapperImpl parentWrapper = options.parent as InstalledAppWrapperImpl
+        if (!parentWrapper) {
+            parentWrapper = new InstalledAppWrapperImpl(nextAppId(), "App", "App", null)
+        }
+
+        Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
+            Closure<File> resolver = (Closure<File>) options.childDeviceResolver
+            assert resolver : "childDeviceResolver is required to build child devices"
+            File deviceFile = resolver(namespace, typeName)
+            assert deviceFile?.exists(): "Could not resolve child device file for ${namespace}:${typeName}"
+
+            // Merge validation flags so child device respects parent flags (including DontRunScript)
+            def childValidationFlags = [] as List<Flags>
+            childValidationFlags.addAll([Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+            if (options.validationFlags) {
+                childValidationFlags.addAll(options.validationFlags as List<Flags>)
+            }
+
+            def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
+            def childScript = deviceSandbox.run(
+                    api: options.childDeviceApi ?: options.api,
+                    validationFlags: childValidationFlags,
+                    withLifecycle: options.withLifecycle,
+                    globals: opts?.globals ?: (options.globals ?: [:]),
+                    userSettingValues: opts?.settings ?: [:],
+                    parent: parentWrapper)
+
+            // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
+            def wrapper = new ChildDeviceWrapperImpl(childScript as DeviceWrapper, dni, parentWrapper?.id, null)
+            childDeviceRegistry.add(dni, wrapper, childScript)
+            return wrapper
+        }
+
+        def childDeviceFactory = { Object opOrNamespace, Object typeName = null, Object deviceNetworkId = null, Object hubId = null, Object opts = [:] ->
+            if (opOrNamespace == 'delete') {
+                childDeviceRegistry.delete(deviceNetworkId as String)
+                return null
+            }
+            if (opOrNamespace == 'get') {
+                return childDeviceRegistry.getByDni(typeName as String)
+            }
+            if (opOrNamespace == 'list') {
+                return childDeviceRegistry.listAll()
+            }
+
+            def namespace = opOrNamespace as String
+            def dni = deviceNetworkId as String
+            return buildChildDevice(namespace, typeName as String, dni, hubId as Long, opts as Map)
+        }
+
+        Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
+            Closure<File> appResolver = (Closure<File>) options.childAppResolver
+            assert appResolver : "childAppResolver is required to build child apps"
+            File appFile = appResolver(namespace, smartAppVersionName)
+            assert appFile?.exists(): "Could not resolve child app file for ${namespace}:${smartAppVersionName}"
+
+            def appSandbox = new HubitatAppSandbox(appFile)
+            def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
+            def childScript = appSandbox.run(
+                    api: options.childAppApi ?: options.api,
+                    validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                    withLifecycle: options.withLifecycle,
+                    parent: childParentWrapper,
+                    childDeviceResolver: options.childDeviceResolver,
+                    childAppResolver: options.childAppResolver)
+
+            childAppRegistry.add(childParentWrapper.id, childParentWrapper, childScript)
+            return childParentWrapper
+        }
+
+        def childAppAccessor = { String op, Object arg = null ->
+            switch (op) {
+                case 'get': return childAppRegistry.getById(arg as Long)
+                case 'getByLabel': return childAppRegistry.getByLabel(arg as String)
+                case 'list': return childAppRegistry.listAll()
+                case 'delete': childAppRegistry.delete(arg as Long); return null
+            }
+        }
+
+        // Wrap executor with child support
+        AppExecutor effectiveApi = new AppChildExecutor(options.api as AppExecutor, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
+
         HubitatAppScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
-        script.initialize(
-                options.api as AppExecutor,
+        // Inject script into parentWrapper so child devices can call methods on the parent app
+        if (parentWrapper.respondsTo('setScript')) {
+            parentWrapper.setScript(script)
+        }
+
+        script.initializeScript(
+                effectiveApi,
                 validator,
                 readUserSettingValues(options),
-                options.customizeScriptBeforeRun as Closure)
+                (Closure) options.customizeScriptBeforeRun,
+                (Closure) childDeviceFactory,
+                (Closure) childAppBuilder,
+                (Object) parentWrapper)
+
+        if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
+            script.installed()
+        }
+
+        if (options.withLifecycle && script.metaClass.respondsTo(script, 'initialize', [] as Object[])) {
+            script.initialize()
+        }
+
+        if (options.parent) {
+            script.setParent(options.parent)
+        }
 
         if (!validator.hasFlag(Flags.DontRunScript)) {
             script.run()
@@ -112,6 +226,13 @@ class HubitatAppSandbox {
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
         objParameter("validator", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppValidator", v as AppValidator) })
         boolParameter("noValidation", notRequired())
+        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
+        objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
+        objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
+        objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
+        objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
+         boolParameter("withLifecycle", notRequired())
     }
 
     @CompileStatic
@@ -127,6 +248,9 @@ class HubitatAppSandbox {
         options.putIfAbsent('validationFlags', [])
         (options.validationFlags as List<Flags>).addAll(flags)
     }
+
+    private static long appIdCounter = 1000
+    private static synchronized long nextAppId() { return ++appIdCounter }
 
     final private File file = null
     final private String text = null

@@ -11,6 +11,12 @@ import groovy.transform.CompileStatic
 class DeviceData implements IInputSource {
     final List<DeviceInput> producedPreferences = []
 
+    // Parent/child relationships
+    Long parentAppId = null
+    Long parentDeviceId = null
+    final Map<String, Object> childDevicesByDni = [:]
+    final List<Object> childDevicesOrdered = []
+
     @Override
     def generateInputWrapper(String name, def userProvidedValue) {
         def input = producedPreferences.find{it->it.readName() == name}
