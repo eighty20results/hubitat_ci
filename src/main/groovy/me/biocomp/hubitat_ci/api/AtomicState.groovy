@@ -1,6 +1,8 @@
 package me.biocomp.hubitat_ci.api
 
 trait AtomicState {
+    static boolean _is_hubitat_ci_private() { return true }
+
     abstract String getDataType()
 
     /**
@@ -66,4 +68,3 @@ trait AtomicState {
     abstract void setValue(java.lang.String a) // Original: public void com.hubitat.hub.domain.State.setValue(java.lang.String)
     abstract java.util.Map toJsonMap() // Original: public java.util.Map com.hubitat.hub.domain.State.toJsonMap()
 }
-
