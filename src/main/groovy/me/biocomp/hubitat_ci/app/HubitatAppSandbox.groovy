@@ -92,7 +92,19 @@ class HubitatAppSandbox {
         if (!options.childDeviceResolver) {
             options.childDeviceResolver = { String namespace, String typeName ->
                 // normalize typeName (strip .groovy if present)
-                String tn = typeName?.endsWith('.groovy') ? typeName[0..-8] : typeName
+                String tn = typeName
+                if (tn == null) tn = ''
+                // If typeName contains '.groovy' somewhere (e.g. 'name.groovy - description'), extract up to it
+                if (tn.contains('.groovy')) {
+                    tn = tn.substring(0, tn.indexOf('.groovy'))
+                }
+                // If still contains a description after ' - ' or whitespace, take the first token
+                if (tn.contains(' - ')) {
+                    tn = tn.split(' - ')[0]
+                }
+                if (tn.contains(' ')) {
+                    tn = tn.split(' ')[0]
+                }
 
                 // Try local src tree first
                 def candidatePaths = [
@@ -112,7 +124,12 @@ class HubitatAppSandbox {
                 }
 
                 // As a last resort, try searching Scripts/Devices for files whose name contains tn
-                new File('Scripts/Devices').eachFileMatch(~/.*${tn}.*/ ) { f -> return f }
+                def scriptsDir = new File('Scripts/Devices')
+                if (scriptsDir.exists()) {
+                    for (f in scriptsDir.listFiles()) {
+                        if (f.name.contains(tn)) return f
+                    }
+                }
 
                 return null
             } as Closure<File>
