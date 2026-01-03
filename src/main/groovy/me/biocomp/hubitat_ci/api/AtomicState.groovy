@@ -1,6 +1,7 @@
 package me.biocomp.hubitat_ci.api
 
 trait AtomicState {
+    static boolean _is_hubitat_ci_private() { return true }
 
     abstract String getDataType()
 

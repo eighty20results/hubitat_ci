@@ -91,19 +91,28 @@ class HubitatAppSandbox {
         // Provide a minimal default childDeviceResolver that searches common locations
         if (!options.childDeviceResolver) {
             options.childDeviceResolver = { String namespace, String typeName ->
+                // normalize typeName (strip .groovy if present)
+                String tn = typeName?.endsWith('.groovy') ? typeName[0..-8] : typeName
+
                 // Try local src tree first
                 def candidatePaths = [
-                        "src/main/groovy/${namespace.replace('.', '/')}/${typeName}.groovy",
-                        "SubmodulesWithScripts/${namespace}/${typeName}.groovy",
-                        "SubmodulesWithScripts/${namespace}/drivers/${typeName}.groovy",
-                        "SubmodulesWithScripts/${namespace}/Drivers/${typeName}.groovy",
-                        "Scripts/Devices/${typeName}.groovy"
+                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
+                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
+                        "SubmodulesWithScripts/${namespace}/${tn}.groovy",
+                        "SubmodulesWithScripts/${namespace}/drivers/${tn}.groovy",
+                        "SubmodulesWithScripts/${namespace}/Drivers/${tn}.groovy",
+                        "Scripts/Devices/${tn}.groovy",
+                        "Scripts/Devices/${namespace}/${tn}.groovy",
+                        "Scripts/Devices/${tn}.groovy"
                 ]
 
                 for (p in candidatePaths) {
                     def f = new File(p)
                     if (f.exists()) return f
                 }
+
+                // As a last resort, try searching Scripts/Devices for files whose name contains tn
+                new File('Scripts/Devices').eachFileMatch(~/.*${tn}.*/ ) { f -> return f }
 
                 return null
             } as Closure<File>
