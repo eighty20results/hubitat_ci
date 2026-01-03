@@ -88,6 +88,27 @@ class HubitatAppSandbox {
             parentWrapper = new InstalledAppWrapperImpl(nextAppId(), "App", "App", null)
         }
 
+        // Provide a minimal default childDeviceResolver that searches common locations
+        if (!options.childDeviceResolver) {
+            options.childDeviceResolver = { String namespace, String typeName ->
+                // Try local src tree first
+                def candidatePaths = [
+                        "src/main/groovy/${namespace.replace('.', '/')}/${typeName}.groovy",
+                        "SubmodulesWithScripts/${namespace}/${typeName}.groovy",
+                        "SubmodulesWithScripts/${namespace}/drivers/${typeName}.groovy",
+                        "SubmodulesWithScripts/${namespace}/Drivers/${typeName}.groovy",
+                        "Scripts/Devices/${typeName}.groovy"
+                ]
+
+                for (p in candidatePaths) {
+                    def f = new File(p)
+                    if (f.exists()) return f
+                }
+
+                return null
+            } as Closure<File>
+        }
+
         Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
             assert resolver : "childDeviceResolver is required to build child devices"
