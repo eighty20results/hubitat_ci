@@ -126,5 +126,58 @@
             {"returnType": "hubitat.helper.ZigbeeUtils", "name": "ZigbeeUtils", "parameters": [], "modifiers": ["constructor"]},
             {"returnType": "java.util.Map", "name": "getAttributes", "parameters": ["java.lang.String"], "modifiers": ["static"]}
         ]
+    },
+    {
+        "class_name": "com.hubitat.hub.domain.AtomicState",
+        "methods": [
+            {"returnType": "java.lang.String", "name": "getDataType", "parameters": []},
+            {"returnType": "java.util.Date", "name": "getDate", "parameters": []},
+            {"returnType": "java.lang.Long", "name": "getId", "parameters": []},
+            {"returnType": "java.lang.Double", "name": "getDoubleValue", "parameters": []},
+            {"returnType": "java.lang.Float", "name": "getFloatValue", "parameters": []},
+            {"returnType": "java.lang.Object", "name": "getJsonValue", "parameters": []},
+            {"returnType": "java.lang.String", "name": "getName", "parameters": []},
+            {"returnType": "java.math.BigDecimal", "name": "getNumberValue", "parameters": []},
+            {"returnType": "java.lang.String", "name": "getStringValue", "parameters": []},
+            {"returnType": "java.lang.String", "name": "getUnit", "parameters": []},
+            {"returnType": "java.lang.String", "name": "getValue", "parameters": []},
+            {"returnType": "com.hubitat.hub.domain.AtomicState", "name": "fromJson", "parameters": ["java.util.Map"]},
+            {"returnType": "void", "name": "setDataType", "parameters": ["java.lang.String"]},
+            {"returnType": "void", "name": "setDate", "parameters": ["java.util.Date"]},
+            {"returnType": "void", "name": "setId", "parameters": ["java.lang.Long"]},
+            {"returnType": "void", "name": "setName", "parameters": ["java.lang.String"]},
+            {"returnType": "void", "name": "setUnit", "parameters": ["java.lang.String"]},
+            {"returnType": "void", "name": "setValue", "parameters": ["java.lang.String"]},
+            {"returnType": "java.util.Map", "name": "toJsonMap", "parameters": []}
+        ]
+    },
+    {
+        "class_name": "com.hubitat.hub.AppAtomicState",
+        "methods": [
+            {"returnType": "void", "name": "clear", "parameters": []},
+            {"returnType": "java.lang.Object", "name": "compute", "parameters": ["java.lang.Object","java.util.function.BiFunction"]},
+            {"returnType": "java.lang.Object", "name": "computeIfAbsent", "parameters": ["java.lang.Object","java.util.function.Function"]},
+            {"returnType": "java.lang.Object", "name": "computeIfPresent", "parameters": ["java.lang.Object","java.util.function.BiFunction"]},
+            {"returnType": "boolean", "name": "containsKey", "parameters": ["java.lang.Object"]},
+            {"returnType": "boolean", "name": "containsValue", "parameters": ["java.lang.Object"]},
+            {"returnType": "java.util.Set", "name": "entrySet", "parameters": []},
+            {"returnType": "void", "name": "forEach", "parameters": ["java.util.function.BiConsumer"]},
+            {"returnType": "java.lang.Object", "name": "get", "parameters": ["java.lang.Object"]},
+            {"returnType": "java.lang.Object", "name": "getOrDefault", "parameters": ["java.lang.Object","java.lang.Object"]},
+            {"returnType": "boolean", "name": "isEmpty", "parameters": []},
+            {"returnType": "java.util.Set", "name": "keySet", "parameters": []},
+            {"returnType": "void", "name": "loadState", "parameters": []},
+            {"returnType": "java.lang.Object", "name": "merge", "parameters": ["java.lang.Object","java.lang.Object","java.util.function.BiFunction"]},
+            {"returnType": "java.lang.Object", "name": "put", "parameters": ["java.lang.Object","java.lang.Object"]},
+            {"returnType": "void", "name": "putAll", "parameters": ["java.util.Map"]},
+            {"returnType": "java.lang.Object", "name": "putIfAbsent", "parameters": ["java.lang.Object","java.lang.Object"]},
+            {"returnType": "java.lang.Object", "name": "remove", "parameters": ["java.lang.Object"]},
+            {"returnType": "boolean", "name": "remove", "parameters": ["java.lang.Object","java.lang.Object"]},
+            {"returnType": "java.lang.Object", "name": "replace", "parameters": ["java.lang.Object","java.lang.Object"]},
+            {"returnType": "boolean", "name": "replace", "parameters": ["java.lang.Object","java.lang.Object","java.lang.Object"]},
+            {"returnType": "void", "name": "replaceAll", "parameters": ["java.util.function.BiFunction"]},
+            {"returnType": "int", "name": "size", "parameters": []},
+            {"returnType": "java.util.Collection", "name": "values", "parameters": []}
+        ]
     }
 ]
