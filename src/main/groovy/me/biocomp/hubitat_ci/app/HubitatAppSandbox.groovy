@@ -149,13 +149,19 @@ class HubitatAppSandbox {
             }
 
             def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
-            def childScript = deviceSandbox.run(
+            def childRunOptions = [
                     api: options.childDeviceApi ?: options.api,
                     validationFlags: childValidationFlags,
-                    withLifecycle: options.withLifecycle,
                     globals: opts?.globals ?: (options.globals ?: [:]),
                     userSettingValues: opts?.settings ?: [:],
-                    parent: parentWrapper)
+                    parent: parentWrapper
+            ] as Map
+
+            if (options.containsKey('withLifecycle') && options.withLifecycle != null) {
+                childRunOptions.withLifecycle = options.withLifecycle
+            }
+
+            def childScript = deviceSandbox.run(childRunOptions)
 
             // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
             def wrapper = new ChildDeviceWrapperImpl(childScript as DeviceWrapper, dni, parentWrapper?.id, null)
@@ -188,13 +194,19 @@ class HubitatAppSandbox {
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
-            def childScript = appSandbox.run(
+            def childAppRunOptions = [
                     api: options.childAppApi ?: options.api,
                     validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
-                    withLifecycle: options.withLifecycle,
                     parent: childParentWrapper,
                     childDeviceResolver: options.childDeviceResolver,
-                    childAppResolver: options.childAppResolver)
+                    childAppResolver: options.childAppResolver
+            ] as Map
+
+            if (options.containsKey('withLifecycle') && options.withLifecycle != null) {
+                childAppRunOptions.withLifecycle = options.withLifecycle
+            }
+
+            def childScript = appSandbox.run(childAppRunOptions)
 
             childAppRegistry.add(childParentWrapper.id, childParentWrapper, childScript)
             return childParentWrapper

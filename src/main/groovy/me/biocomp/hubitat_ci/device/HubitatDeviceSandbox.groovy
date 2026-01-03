@@ -87,13 +87,22 @@ class HubitatDeviceSandbox {
             assert deviceFile?.exists(): "Could not resolve component device file for ${opOrNamespace}:${typeName}"
 
             def sandbox = new HubitatDeviceSandbox(deviceFile)
-            def childScript = sandbox.run(
+            def childRunOptions = [
                     api: options.childDeviceApi ?: options.api,
                     validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
-                    withLifecycle: options.withLifecycle,
                     globals: (opts instanceof Map) ? opts.globals : null,
                     userSettingValues: (opts instanceof Map) ? (opts.settings ?: [:]) : [:],
-                    parent: options.parent)
+                    parent: options.parent
+            ] as Map
+
+            // Only set withLifecycle if the caller explicitly provided it. Passing
+            // a null value will cause the NamedParametersValidator.boolParameter to
+            // assert (it expects a non-null boolean when the key is present).
+            if (options.containsKey('withLifecycle') && options.withLifecycle != null) {
+                childRunOptions.withLifecycle = options.withLifecycle
+            }
+
+            def childScript = sandbox.run(childRunOptions)
 
             def dni = deviceNetworkId as String
             def parentId = (options.parent && options.parent.respondsTo('getId')) ? options.parent.id as Long : null

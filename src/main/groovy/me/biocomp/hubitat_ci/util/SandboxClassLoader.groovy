@@ -125,6 +125,13 @@ class SandboxClassLoader extends ClassLoader {
             case 'hubitat.helper.ZigbeeUtils':
                 return "${basePackageName}common_api.ZigbeeUtils"
 
+            // AtomicState is represented in the local API root package rather than under hub.domain
+            case 'hubitat.hub.domain.AtomicState':
+                return "${basePackageName}AtomicState"
+
+            case 'com.hubitat.hub.domain.State':
+                return "${basePackageName}State"
+
             default:
                 if (name.startsWith("hubitat")) {
                     return name.replace('hubitat.', "${basePackageName}")
