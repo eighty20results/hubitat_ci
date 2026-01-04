@@ -201,14 +201,11 @@ class DeviceMetadataReader implements
 
     @Delegate
     private final DeviceExecutor delegate
-
     private final ReaderState states = new ReaderState(['metadata()'   : [],
                                                         'definition()' : ['metadata()'],
                                                         'preferences()': ['metadata()'],
                                                         'section()'    : ['metadata()', 'preferences()']])
-
     private final DeviceValidator validator
-
     private Definition producedDefinition
     private final DeviceData deviceData
     private final SettingsContainer settingsContainer
@@ -227,4 +224,3 @@ class DeviceMetadataReader implements
         return settingsContainer
     }
 }
-
