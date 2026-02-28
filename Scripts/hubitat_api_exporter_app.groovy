@@ -1,3 +1,5 @@
+import groovy.transform.Field
+
 definition(
         name: "hubitat_api_exporter_app.groovy - exports Hubitat APIs",
         namespace: "me.biocomp",
@@ -12,9 +14,9 @@ preferences() {
     page(name: "setupScreen")
 }
 
-@groovy.transform.Field static Object capturedEvent = null
-@groovy.transform.Field static Object capturedHubResponse = null
-@groovy.transform.Field static Object lock = new Object()
+@Field static Object capturedEvent = null
+@Field static Object capturedHubResponse = null
+@Field static Object lock = new Object()
 
 private def updateImpl() {
     unsubscribe()

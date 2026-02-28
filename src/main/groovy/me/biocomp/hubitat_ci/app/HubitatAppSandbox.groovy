@@ -149,8 +149,21 @@ class HubitatAppSandbox {
             }
 
             def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
+            // Ensure we only pass a DeviceExecutor to child device runs. If caller provided
+            // a specific childDeviceApi use it; otherwise, only use options.api when it
+            // is actually a DeviceExecutor implementation. Passing an AppExecutor here
+            // causes DeviceMetadataReader to be constructed with the wrong delegate and
+            // later MissingMethodException when device-specific getters (like getZwave)
+            // are invoked.
+            def resolvedApi = null
+            if (options.childDeviceApi) {
+                resolvedApi = options.childDeviceApi
+            } else if (options.api instanceof me.biocomp.hubitat_ci.api.device_api.DeviceExecutor) {
+                resolvedApi = options.api
+            }
+
             def childRunOptions = [
-                    api: options.childDeviceApi ?: options.api,
+                    api: resolvedApi,
                     validationFlags: childValidationFlags,
                     globals: opts?.globals ?: (options.globals ?: [:]),
                     userSettingValues: opts?.settings ?: [:],

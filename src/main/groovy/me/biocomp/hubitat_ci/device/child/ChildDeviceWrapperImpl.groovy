@@ -43,5 +43,21 @@ class ChildDeviceWrapperImpl implements ChildDeviceWrapper {
     private final String deviceNetworkId
     private final Long parentAppId
     private final Long parentDeviceId
-}
 
+    // Forward dynamic command/method calls (e.g. on(), off()) to the underlying delegate
+    @SuppressWarnings(['unused'])
+    public def methodMissing(String name, args) {
+        // delegate may implement dynamic method handling; forward via invokeMethod
+        return delegate?.invokeMethod(name, args)
+    }
+
+    @SuppressWarnings(['unused'])
+    public def invokeMethod(String name, args) {
+        // Prefer calling the actual method if present, otherwise forward to delegate
+        def mm = this.metaClass.getMetaMethod(name, args)
+        if (mm) {
+            return mm.invoke(this, args)
+        }
+        return delegate?.invokeMethod(name, args)
+    }
+}
