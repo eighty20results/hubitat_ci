@@ -96,3 +96,8 @@ AudioNotification, capability.audioNotification, yes,
 91 WindowShade
 92 ZwMultichannel
 93 pHMeasurement
+94 AirQuality
+95 PM2_5
+96 PM10
+97 MediaPlayback
+98 Variable

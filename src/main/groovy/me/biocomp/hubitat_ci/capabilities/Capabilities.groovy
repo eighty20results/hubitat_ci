@@ -226,6 +226,7 @@ class Capabilities
          TouchSensor,
          UltravioletIndex,
          Valve,
+         Variable,
          VideoCamera,
          //VideoCapture,
          VoltageMeasurement,

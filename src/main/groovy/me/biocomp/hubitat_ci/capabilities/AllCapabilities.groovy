@@ -1138,6 +1138,16 @@ interface Valve extends Capability
     abstract void close()
 }
 
+interface Variable extends Capability
+{
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
+        stringAttribute("variable")
+    }
+
+    @CompileStatic
+    abstract void setVariable(String valueToSet)
+}
+
 // Video Stream
 // Video Clips
 

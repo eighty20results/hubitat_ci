@@ -82,7 +82,8 @@ class DeviceValidator extends
     void validateDefinition(Definition definition, MetaClass scriptMetaClass) {
         definitionOptionsValidator.validate("definition(${definition.options})", definition.options, flags)
 
-        if (!hasFlag(Flags.DontRequireCapabilityImplementationMethods)) {
+        if (!hasFlag(Flags.DontRequireCapabilityImplementationMethods) &&
+                !hasFlag(Flags.DontValidateCapabilities)) {
             def scriptActualMethods = scriptMetaClass.theClass.methods.findAll {
                 it.declaringClass == scriptMetaClass.theClass
             }.collectEntries {
@@ -106,6 +107,10 @@ class DeviceValidator extends
     }
 
     void validateCapability(String capabilityName) {
+        if (hasFlag(Flags.DontValidateCapabilities)) {
+            return
+        }
+
         assert (Capabilities.findCapabilityByName(
                 capabilityName)): "capability '${capabilityName}' is not supported. Valid capabilities are: ${Capabilities.capabilitiesByPrettyName.keySet() + Capabilities.capabilitiesByDriverDefinition.keySet()}."
     }

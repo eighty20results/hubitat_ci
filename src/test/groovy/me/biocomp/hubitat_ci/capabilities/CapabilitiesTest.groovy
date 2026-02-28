@@ -113,6 +113,7 @@ class CapabilitiesTest extends Specification
             new TestCapabilityInfo("touchSensor", "TouchSensor", "Touch Sensor"),
             new TestCapabilityInfo("ultravioletIndex", "UltravioletIndex", "Ultraviolet Index"),
             new TestCapabilityInfo("valve", "Valve"),
+            new TestCapabilityInfo("variable", "Variable"),
             new TestCapabilityInfo("videoCamera", "VideoCamera", "Video Camera"),
             //new TestCapabilityInfo("videoCapture", "VideoCapture", "Video Capture"),
             new TestCapabilityInfo("voltageMeasurement", "VoltageMeasurement", "Voltage Measurement"),

@@ -55,17 +55,8 @@ class HubitatDeviceSandbox {
     private HubitatDeviceScript setupImpl(Map options) {
         validateAndUpdateSandboxOptions(options)
 
-        // Merge validation flags so caller controls definition/prefs/run behavior
-        def effectiveFlags = [] as List<Flags>
-        effectiveFlags.addAll(options.validationFlags ?: [])
-        if (!effectiveFlags.contains(Flags.DontValidateDefinition)) {
-            effectiveFlags << Flags.DontValidateDefinition
-        }
-        if (!effectiveFlags.contains(Flags.DontValidatePreferences)) {
-            effectiveFlags << Flags.DontValidatePreferences
-        }
-
-        def validator = readValidator([validationFlags: effectiveFlags])
+        // Respect caller-provided validation flags; child sandboxes pass relaxed flags explicitly.
+        def validator = readValidator([validationFlags: (options.validationFlags ?: [])])
 
         def registry = new ChildDeviceRegistry()
 
@@ -202,6 +193,7 @@ class HubitatDeviceSandbox {
         objParameter("userSettingValues", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
         objParameter("customizeScriptBeforeRun", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure taking HubitatDeviceScript", v as Closure) })
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
+        boolParameter("noValidation", notRequired())
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
@@ -211,6 +203,10 @@ class HubitatDeviceSandbox {
 
     private static void validateAndUpdateSandboxOptions(Map options) {
         optionsValidator.validate("Validating sandbox options", options, EnumSet.noneOf(Flags))
+
+        if (options.noValidation) {
+            addFlags(options, [Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+        }
     }
 
     static private void addFlags(Map options, List<Flags> flags) {
