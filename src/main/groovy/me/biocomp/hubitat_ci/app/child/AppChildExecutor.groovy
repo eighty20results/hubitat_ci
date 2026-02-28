@@ -82,17 +82,26 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
-        return childDeviceRegistry.getByDni(deviceNetworkId)
+        def createdChild = childDeviceRegistry.getByDni(deviceNetworkId)
+        if (createdChild != null) {
+            return createdChild
+        }
+
+        return delegate?.getChildDevice(deviceNetworkId)
     }
 
     @Override
     List getChildDevices() {
-        return childDeviceRegistry.listAll()
+        def createdChildren = childDeviceRegistry.listAll()
+        def delegatedChildren = delegate?.getChildDevices() ?: []
+        return mergeUnique(createdChildren, delegatedChildren)
     }
 
     @Override
     List getAllChildDevices() {
-        return getChildDevices()
+        def createdChildren = childDeviceRegistry.listAll()
+        def delegatedChildren = delegate?.getAllChildDevices() ?: []
+        return mergeUnique(createdChildren, delegatedChildren)
     }
 
     @Override
@@ -130,5 +139,23 @@ class AppChildExecutor implements AppExecutor {
     @Override
     InstalledAppWrapper getParent() {
         return parent
+    }
+
+    @CompileStatic
+    private static List mergeUnique(List first, List second) {
+        final List merged = []
+        for (Object child in (first ?: [])) {
+            if (!merged.contains(child)) {
+                merged.add(child)
+            }
+        }
+
+        for (Object child in (second ?: [])) {
+            if (!merged.contains(child)) {
+                merged.add(child)
+            }
+        }
+
+        return merged
     }
 }

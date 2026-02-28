@@ -157,16 +157,43 @@ abstract class HubitatAppScript extends
 
     List getChildDevices() {
         assert childDeviceFactory != null: "Child device factory is not configured"
-        return childDeviceFactory.call('list') as List
+        final List createdChildren = (childDeviceFactory.call('list') ?: []) as List
+        final List delegatedChildren = (this.@api?.getChildDevices() ?: []) as List
+        return mergeUniqueChildren(createdChildren, delegatedChildren)
     }
 
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
         assert childDeviceFactory != null: "Child device factory is not configured"
-        return childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+        final ChildDeviceWrapper createdChild = childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+        if (createdChild != null) {
+            return createdChild
+        }
+
+        return this.@api?.getChildDevice(deviceNetworkId) as ChildDeviceWrapper
     }
 
     List getAllChildDevices() {
-        return getChildDevices()
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        final List createdChildren = (childDeviceFactory.call('list') ?: []) as List
+        final List delegatedChildren = (this.@api?.getAllChildDevices() ?: []) as List
+        return mergeUniqueChildren(createdChildren, delegatedChildren)
+    }
+
+    private static List mergeUniqueChildren(List first, List second) {
+        final List merged = []
+        for (Object child in (first ?: [])) {
+            if (!merged.contains(child)) {
+                merged.add(child)
+            }
+        }
+
+        for (Object child in (second ?: [])) {
+            if (!merged.contains(child)) {
+                merged.add(child)
+            }
+        }
+
+        return merged
     }
 
     InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {

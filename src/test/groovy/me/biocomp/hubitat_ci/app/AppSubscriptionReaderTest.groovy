@@ -18,6 +18,9 @@ class AppSubscriptionReaderTest extends Specification {
         _ * getChildDevices() >> [Mock(ChildDeviceWrapper){
 
         }]
+        _ * getAllChildDevices() >> [Mock(ChildDeviceWrapper){
+
+        }]
     }
 
     private void runScript(String subscribeCall, String handler, List<Flags> validationFlags = [], boolean multiple = false) {
@@ -70,6 +73,7 @@ class AppSubscriptionReaderTest extends Specification {
            [ "subscribe(device1, 'thermostatMode', { evtHandler() } )"      , "Event handler being a closure also works" ],
            [ "subscribe(location, { log.info(evt.name) } )"                 , "Event handler being a closure also works for location" ],
            [ "subscribe(getChildDevices()[0], 'thermostat', evtHandler)"      , "it's a ChildDeviceWrapper and correct capability specified" ],
+           [ "subscribe(getAllChildDevices()[0], 'thermostat', evtHandler)"   , "it's a ChildDeviceWrapper from getAllChildDevices() and correct capability specified" ],
     ].collect{[subscribeCall: it[0], explanation: it[1]]}
 
     static private def makeScriptForSubscribeTest(String subscribeCall, String eventHandler, boolean multiple = false) {
