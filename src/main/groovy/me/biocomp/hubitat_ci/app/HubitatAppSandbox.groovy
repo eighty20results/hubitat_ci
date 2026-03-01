@@ -263,11 +263,8 @@ class HubitatAppSandbox {
                 case 'get': return childAppRegistry.getById(arg as Long)
                 case 'getByLabel': return childAppRegistry.getByLabel(arg as String)
                 case 'list': return childAppRegistry.listAll()
-        // Wrap executor with child support, preserving null when no base API is provided
-        AppExecutor baseApi = options.api as AppExecutor
-        AppExecutor effectiveApi = baseApi != null
-                ? new AppChildExecutor(baseApi, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
-                : null
+                case 'delete': childAppRegistry.delete(arg as Long); return null
+            }
         }
 
         // Wrap executor with child support
@@ -288,8 +285,7 @@ class HubitatAppSandbox {
         script.initializeScript(
                 effectiveApi,
                 validator,
-                (Object) parentWrapper,
-                (Closure) childAppAccessor)
+                readUserSettingValues(options),
                 (Closure) options.customizeScriptBeforeRun,
                 (Closure) childDeviceFactory,
                 (Closure) childAppBuilder,
