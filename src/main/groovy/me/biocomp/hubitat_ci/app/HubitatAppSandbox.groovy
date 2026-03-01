@@ -85,7 +85,7 @@ class HubitatAppSandbox {
         def childDeviceRegistry = new ChildDeviceRegistry()
         def childAppRegistry = new ChildAppRegistry()
 
-        InstalledAppWrapperImpl parentWrapper = options.parent as InstalledAppWrapperImpl
+        def parentWrapper = options.parent
         if (!parentWrapper) {
             parentWrapper = new InstalledAppWrapperImpl(nextAppId(), "App", "App", null)
         }
