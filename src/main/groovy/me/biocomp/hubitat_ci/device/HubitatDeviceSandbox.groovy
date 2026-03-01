@@ -158,25 +158,6 @@ class HubitatDeviceSandbox {
             // Best-effort fallback.
         }
 
-        // Some real-world drivers access `device.displayName` (and friends) during installed()/initialize().
-        // When tests supply a minimal DeviceExecutor mock, getDevice() may be null unless stubbed.
-        // Provide a small default DeviceWrapper so scripts can run lifecycle code safely.
-        try {
-            if (effectiveApi != null && effectiveApi.metaClass.respondsTo(effectiveApi, 'getDevice')) {
-                def currentDevice = effectiveApi.getDevice()
-                if (currentDevice == null) {
-                    def fallbackDevice = [
-                            getDisplayName: { -> "Device" },
-                            getLabel      : { -> "Device" },
-                            getName       : { -> "Device" }
-                    ] as DeviceWrapper
-                    effectiveApi.metaClass.getDevice = { -> fallbackDevice }
-                }
-            }
-        } catch (Throwable ignored) {
-            // Best-effort fallback; ignore if executor implementation forbids metaClass changes.
-        }
-
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
             script.installed()
         }
