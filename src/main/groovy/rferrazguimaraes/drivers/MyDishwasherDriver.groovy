@@ -216,7 +216,9 @@ void updateAvailableOptionsList() {
     }
 
     state.foundAvailableProgramOptions = []
-    sendEvent(name: "AvailableOptionsList", value: [], displayed: false)
+    def emptyJson = new JsonBuilder([]).toString()
+    emptyJson = unescapeUnicode(emptyJson)
+    sendEvent(name: "AvailableOptionsList", value: emptyJson, displayed: false)
 }
 
 /* ---------- Switch handling ---------- */
