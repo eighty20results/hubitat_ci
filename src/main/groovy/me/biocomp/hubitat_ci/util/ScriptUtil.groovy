@@ -3,9 +3,14 @@ package me.biocomp.hubitat_ci.util
 import groovy.transform.CompileStatic
 
 import java.lang.reflect.Method
+import java.util.concurrent.ConcurrentHashMap
 
 @CompileStatic
 class ScriptUtil {
+    // A static map for early property initialization (before userSettingsMap is available).
+    // ConcurrentHashMap provides thread-safe atomic operations (putIfAbsent, get).
+    private static final ConcurrentHashMap<Object, ConcurrentHashMap<String, Object>> earlyInitStore =
+        new ConcurrentHashMap<Object, ConcurrentHashMap<String, Object>>()
 
     static def handleGetProperty(String property, def scriptObject, Map userSettingsMap, Map globals = null)
     {
@@ -47,16 +52,10 @@ class ScriptUtil {
             return userSettingsMap.get(property)
         }
 
-        // Fall back: check for an internalState map attached to the script (used by tests/sandbox)
-        try {
-            if (scriptMetaClass.hasProperty(scriptObject, 'internalState')) {
-                def internal = scriptMetaClass.getProperty(scriptObject as GroovyObjectSupport, 'internalState')
-                if (internal instanceof Map && internal.containsKey(property)) {
-                    return internal.get(property)
-                }
-            }
-        } catch (Throwable ignored) {
-            // best-effort fallback; don't fail if we can't read internalState
+        // Fall back: check earlyInitStore for properties set before userSettingsMap was available
+        ConcurrentHashMap<String, Object> earlyProps = earlyInitStore.get(scriptObject)
+        if (earlyProps != null && earlyProps.containsKey(property)) {
+            return earlyProps.get(property)
         }
 
         return null
@@ -96,32 +95,11 @@ class ScriptUtil {
             return
         }
 
-        // If userSettingsMap is not available yet (early initialization), try safe fallbacks
+        // If userSettingsMap is not available yet (early initialization), use earlyInitStore
         if (userSettingsMap == null) {
-            try {
-                final def scriptMetaClass = scriptObject.getMetaClass()
-                // If metaClass already exposes the property, set it there (this avoids going through setProperty again)
-                if (scriptMetaClass.hasProperty(scriptObject, property)) {
-                    scriptMetaClass.setProperty(scriptObject as GroovyObjectSupport, property, newValue)
-                    return
-                }
-
-                // Otherwise, maintain a small internalState map on the script object and store the value there.
-                if (!scriptMetaClass.hasProperty(scriptObject, 'internalState')) {
-                    scriptMetaClass.setProperty(scriptObject as GroovyObjectSupport, 'internalState', [:])
-                }
-                def internal = scriptMetaClass.getProperty(scriptObject as GroovyObjectSupport, 'internalState') as Map
-                internal.put(property, newValue)
-                return
-            } catch (Throwable t) {
-                // best-effort; if anything fails and userSettingsMap is still null, throw a clear error below.
-            }
-
-            if (userSettingsMap == null) {
-                throw new IllegalStateException(
-                    "Cannot set property '${property}' because userSettingsMap is null and internal fallback handling failed"
-                )
-            }
+            earlyInitStore.putIfAbsent(scriptObject, new ConcurrentHashMap<String, Object>())
+            earlyInitStore.get(scriptObject).put(property, (Object) newValue)
+            return
         }
 
         // Use settings
