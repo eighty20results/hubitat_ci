@@ -289,7 +289,7 @@ class HubitatAppSandbox {
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
-        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v) })
         objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
          boolParameter("withLifecycle", notRequired())
