@@ -192,9 +192,17 @@ class HubitatAppSandbox {
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
+
+            // Merge validation flags so child app respects parent flags (including DontRunScript)
+            def childAppValidationFlags = [] as List<Flags>
+            childAppValidationFlags.addAll([Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+            if (options.validationFlags) {
+                childAppValidationFlags.addAll(options.validationFlags as List<Flags>)
+            }
+
             def childAppRunOptions = [
                     api: options.childAppApi ?: options.api,
-                    validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                    validationFlags: childAppValidationFlags,
                     parent: childParentWrapper,
                     childDeviceResolver: options.childDeviceResolver,
                     childAppResolver: options.childAppResolver
