@@ -158,11 +158,11 @@ abstract class HubitatDeviceScript extends Script
     Map getGlobals() { return this.globals }
 
     void setParent(Object parent) {
-        this.parent = parent
+        this.@parent = parent
     }
 
     Object getParent() {
-        return this.parent
+        return this.@parent
     }
 
     private Map internalState = null
