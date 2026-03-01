@@ -145,23 +145,6 @@ class HubitatDeviceSandbox {
                 readUserSettingValues(options),
                 options.customizeScriptBeforeRun as Closure)
 
-        // Ensure 'state' exists even if the provided DeviceExecutor mock doesn't stub getState().
-        try {
-            if (effectiveApi != null && effectiveApi.metaClass.respondsTo(effectiveApi, 'getState')) {
-                def st = effectiveApi.getState()
-                if (st == null) {
-                    def backingState = [:]
-                    effectiveApi.metaClass.getState = { -> backingState }
-                }
-            }
-        } catch (Throwable ignored) {
-            // Best-effort fallback.
-        }
-
-        if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
-            script.installed()
-        }
-
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'initialize')) {
             script.initialize()
         }
