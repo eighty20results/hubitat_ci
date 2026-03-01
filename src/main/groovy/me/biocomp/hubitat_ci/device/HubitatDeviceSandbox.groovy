@@ -97,7 +97,7 @@ class HubitatDeviceSandbox {
 
             def dni = deviceNetworkId as String
             def parentId = (options.parent && options.parent.respondsTo('getId')) ? options.parent.id as Long : null
-            def wrapper = new ChildDeviceWrapperImpl(childScript as DeviceWrapper, dni, null, parentId)
+            def wrapper = new ChildDeviceWrapperImpl(childScript.device as DeviceWrapper, dni, null, parentId)
             registry.add(dni, wrapper, childScript)
             return wrapper
         }
