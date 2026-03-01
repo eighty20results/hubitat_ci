@@ -3,14 +3,15 @@ package me.biocomp.hubitat_ci.util
 import groovy.transform.CompileStatic
 
 import java.lang.reflect.Method
-import java.util.concurrent.ConcurrentHashMap
 
 @CompileStatic
 class ScriptUtil {
     // A static map for early property initialization (before userSettingsMap is available).
-    // ConcurrentHashMap provides thread-safe atomic operations (putIfAbsent, get).
-    private static final ConcurrentHashMap<Object, ConcurrentHashMap<String, Object>> earlyInitStore =
-        new ConcurrentHashMap<Object, ConcurrentHashMap<String, Object>>()
+    // WeakHashMap allows script object keys to be garbage-collected once no longer
+    // strongly referenced, preventing memory leaks across test runs.
+    // synchronizedMap guards all compound read-modify-write operations.
+    private static final Map<Object, Map<String, Object>> earlyInitStore =
+        Collections.synchronizedMap(new WeakHashMap<Object, Map<String, Object>>())
 
     static def handleGetProperty(String property, def scriptObject, Map userSettingsMap, Map globals = null)
     {
@@ -53,9 +54,11 @@ class ScriptUtil {
         }
 
         // Fall back: check earlyInitStore for properties set before userSettingsMap was available
-        ConcurrentHashMap<String, Object> earlyProps = earlyInitStore.get(scriptObject)
-        if (earlyProps != null && earlyProps.containsKey(property)) {
-            return earlyProps.get(property)
+        synchronized (earlyInitStore) {
+            Map<String, Object> earlyProps = earlyInitStore.get(scriptObject)
+            if (earlyProps != null && earlyProps.containsKey(property)) {
+                return earlyProps.get(property)
+            }
         }
 
         return null
@@ -97,9 +100,24 @@ class ScriptUtil {
 
         // If userSettingsMap is not available yet (early initialization), use earlyInitStore
         if (userSettingsMap == null) {
-            earlyInitStore.putIfAbsent(scriptObject, new ConcurrentHashMap<String, Object>())
-            earlyInitStore.get(scriptObject).put(property, (Object) newValue)
+            synchronized (earlyInitStore) {
+                if (!earlyInitStore.containsKey(scriptObject)) {
+                    earlyInitStore.put(scriptObject, new HashMap<String, Object>())
+                }
+                earlyInitStore.get(scriptObject).put(property, (Object) newValue)
+            }
             return
+        }
+
+        // Migrate any early-init properties into userSettingsMap and release the earlyInitStore entry.
+        // The containsKey check avoids acquiring the explicit lock when there is nothing to migrate.
+        if (earlyInitStore.containsKey(scriptObject)) {
+            synchronized (earlyInitStore) {
+                Map<String, Object> earlyProps = earlyInitStore.remove(scriptObject)
+                if (earlyProps != null) {
+                    userSettingsMap.putAll(earlyProps)
+                }
+            }
         }
 
         // Use settings
