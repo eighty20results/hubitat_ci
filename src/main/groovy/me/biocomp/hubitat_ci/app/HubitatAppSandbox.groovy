@@ -127,8 +127,17 @@ class HubitatAppSandbox {
                 // As a last resort, try searching Scripts/Devices for files whose name contains tn
                 def scriptsDir = new File('Scripts/Devices')
                 if (scriptsDir.exists()) {
-                    for (f in scriptsDir.listFiles()) {
-                        if (f.name.contains(tn)) return f
+                    def files = scriptsDir.listFiles()
+                    if (files != null) {
+                        for (f in files) {
+                            // Skip directories and other non-regular files
+                            if (!f.isFile()) {
+                                continue
+                            }
+                            if (f.name.contains(tn)) {
+                                return f
+                            }
+                        }
                     }
                 }
 
