@@ -68,9 +68,11 @@ class ChildDeviceLifecycleSpec extends Specification {
 
     def "default childDeviceResolver finds device file from Scripts/Devices directory"() {
         given: "a device file placed in the Scripts/Devices directory (as the default resolver searches there)"
+        def uniqueTypeName = "TestDevice_${UUID.randomUUID().toString().replace('-', '')}"
         def scriptsDevicesDir = new File("Scripts/Devices")
+        def dirCreatedByTest = !scriptsDevicesDir.exists()
         scriptsDevicesDir.mkdirs()
-        def deviceFile = new File(scriptsDevicesDir, "DefaultResolverTestDevice.groovy")
+        def deviceFile = new File(scriptsDevicesDir, "${uniqueTypeName}.groovy")
         deviceFile.text = """
             import groovy.transform.Field
             @Field def installedCalled = false
@@ -84,7 +86,7 @@ class ChildDeviceLifecycleSpec extends Specification {
         appFile.text = """
             definition(name: \"Parent App\", namespace: \"test\", author: \"me\")
             preferences { }
-            def installed() { addChildDevice('test', 'DefaultResolverTestDevice', 'dni-default') }
+            def installed() { addChildDevice('test', '${uniqueTypeName}', 'dni-default') }
             def initialize() { }
         """.stripIndent()
 
@@ -110,7 +112,7 @@ class ChildDeviceLifecycleSpec extends Specification {
             appFile.delete()
         }
         // Remove Scripts/Devices directory if this test created it and it is now empty
-        if (scriptsDevicesDir?.exists()) {
+        if (dirCreatedByTest && scriptsDevicesDir?.exists()) {
             def children = scriptsDevicesDir.listFiles()
             if (children == null || children.length == 0) {
                 scriptsDevicesDir.delete()
