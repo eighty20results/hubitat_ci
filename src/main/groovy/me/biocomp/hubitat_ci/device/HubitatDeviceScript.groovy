@@ -129,10 +129,6 @@ abstract class HubitatDeviceScript extends Script
                 break
         }
 
-        if (this.@globals != null && this.@globals.containsKey(property)) {
-            return this.@globals.get(property)
-        }
-
         return ScriptUtil.handleGetProperty(property, this, this.@userSettingsMap, this.@globals)
     }
 
