@@ -6,8 +6,14 @@ import java.lang.reflect.Method
 
 @CompileStatic
 class ScriptUtil {
+    // A static map for early property initialization (before userSettingsMap is available).
+    // WeakHashMap allows script object keys to be garbage-collected once no longer
+    // strongly referenced, preventing memory leaks across test runs.
+    // synchronizedMap guards all compound read-modify-write operations.
+    private static final Map<Object, Map<String, Object>> earlyInitStore =
+        Collections.synchronizedMap(new WeakHashMap<Object, Map<String, Object>>())
 
-    static def handleGetProperty(String property, def scriptObject, Map userSettingsMap)
+    static def handleGetProperty(String property, def scriptObject, Map userSettingsMap, Map globals = null)
     {
         switch (property) {
             case "metaClass":
@@ -25,6 +31,11 @@ class ScriptUtil {
             // It's OK, it might be handled below
         }
 
+        // Allow explicit globals to mimic hub parent/child wiring
+        if (globals != null && globals.containsKey(property)) {
+            return globals.get(property)
+        }
+
         final def scriptMetaClass = scriptObject.getMetaClass()
 
         // There's a property, return it.
@@ -37,8 +48,20 @@ class ScriptUtil {
             return property
         }
 
-        // Use settings map
-        return userSettingsMap.get(property)
+        // Use settings map if available
+        if (userSettingsMap != null) {
+            return userSettingsMap.get(property)
+        }
+
+        // Fall back: check earlyInitStore for properties set before userSettingsMap was available
+        synchronized (earlyInitStore) {
+            Map<String, Object> earlyProps = earlyInitStore.get(scriptObject)
+            if (earlyProps != null && earlyProps.containsKey(property)) {
+                return earlyProps.get(property)
+            }
+        }
+
+        return null
     }
 
     // Just pick first method with same name and one parameter.
@@ -73,6 +96,28 @@ class ScriptUtil {
         {
             setter.invoke(scriptObject, newValue)
             return
+        }
+
+        // If userSettingsMap is not available yet (early initialization), use earlyInitStore
+        if (userSettingsMap == null) {
+            synchronized (earlyInitStore) {
+                if (!earlyInitStore.containsKey(scriptObject)) {
+                    earlyInitStore.put(scriptObject, new HashMap<String, Object>())
+                }
+                earlyInitStore.get(scriptObject).put(property, (Object) newValue)
+            }
+            return
+        }
+
+        // Migrate any early-init properties into userSettingsMap and release the earlyInitStore entry.
+        // The containsKey check avoids acquiring the explicit lock when there is nothing to migrate.
+        if (earlyInitStore.containsKey(scriptObject)) {
+            synchronized (earlyInitStore) {
+                Map<String, Object> earlyProps = earlyInitStore.remove(scriptObject)
+                if (earlyProps != null) {
+                    userSettingsMap.putAll(earlyProps)
+                }
+            }
         }
 
         // Use settings

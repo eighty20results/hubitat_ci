@@ -509,4 +509,3 @@ trait DeviceExecutor implements
     abstract java.lang.String zwaveSecureEncap(me.biocomp.hubitat_ci.api.device_api.zwave.Command a) // Original: public java.lang.String com.hubitat.hub.executor.DeviceExecutor.zwaveSecureEncap(hubitat.zwave.Command)
     abstract java.lang.String zwaveSecureEncap(java.lang.String a) // Original: public java.lang.String com.hubitat.hub.executor.DeviceExecutor.zwaveSecureEncap(java.lang.String)
 }
-

@@ -18,6 +18,13 @@ class AppData implements IInputSource {
 
     final Preferences preferences = new Preferences()
 
+    // Parent/child relationships
+    Long parentAppId = null
+    final Map<Long, Object> childAppsById = [:]
+    final List<Object> childAppsOrdered = []
+    final Map<String, Object> childDevicesByDni = [:]
+    final List<Object> childDevicesOrdered = []
+
     @Override
     @CompileStatic
     def generateInputWrapper(String name, def userProvidedValue) {

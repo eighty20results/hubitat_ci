@@ -26,7 +26,7 @@ class MappingPath {
             def scriptWithInjectedProps = script.getMetaClass().invokeConstructor()
             scriptWithInjectedProps.setMetaClass(script.getMetaClass())
 
-            scriptWithInjectedProps.initialize(script)
+            scriptWithInjectedProps.initializeFromParent(script)
             scriptWithInjectedProps.installMappingInjectedProps(params, request)
             return scriptWithInjectedProps
         }

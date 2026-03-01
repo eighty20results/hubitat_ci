@@ -17,6 +17,14 @@ import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
 * - Methods from BaseScheduler trait (passed through to a BaseScheduler dependency)
 */
 abstract class IntegrationAppExecutor implements AppExecutor, PassthroughScheduler {
+    IntegrationAppExecutor() {
+        this((BaseScheduler) null)
+    }
+
+    IntegrationAppExecutor(Map args) {
+        this(args?.scheduler as BaseScheduler)
+    }
+
     IntegrationAppExecutor(BaseScheduler scheduler) {
         this.scheduler = scheduler
     }
@@ -59,22 +67,22 @@ abstract class IntegrationAppExecutor implements AppExecutor, PassthroughSchedul
     void subscribe(Object toWhat, String attributeNameOrNameAndValueOrEventName, Object handler) {
         if (toWhat in Collection) {
             toWhat.each { Object it ->
-                deviceEventSubscriptions << new DeviceEventSubInfo(it, attributeNameOrNameAndValueOrEventName, handler)
+                this.@deviceEventSubscriptions << new DeviceEventSubInfo(it, attributeNameOrNameAndValueOrEventName, handler)
             }
         }
         else {
-            deviceEventSubscriptions << new DeviceEventSubInfo(toWhat, attributeNameOrNameAndValueOrEventName, handler)
+            this.@deviceEventSubscriptions << new DeviceEventSubInfo(toWhat, attributeNameOrNameAndValueOrEventName, handler)
         }
     }
 
     @Override
     void unsubscribe() {
-        deviceEventSubscriptions.clear()
+        this.@deviceEventSubscriptions.clear()
     }
 
     @Override
     void sendEvent(DeviceWrapper device, Map properties) {
-        deviceEventSubscriptions.each { DeviceEventSubInfo subInfo ->
+        this.@deviceEventSubscriptions.each { DeviceEventSubInfo subInfo ->
             if (subInfo.toWhat != device) {
                 return
             }
@@ -84,7 +92,7 @@ abstract class IntegrationAppExecutor implements AppExecutor, PassthroughSchedul
 
             if (matchOfAttributeName || matchOfNameAndValue) {
                 def generatedEvent = new DeviceEventArgs(device.getIdAsLong(), device, properties.name, properties.value)
-                script."$subInfo.handler"(generatedEvent)
+                this.@script."$subInfo.handler"(generatedEvent)
             }
         }
     }

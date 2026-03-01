@@ -7,6 +7,10 @@ import me.biocomp.hubitat_ci.validation.Flags
 import me.biocomp.hubitat_ci.validation.NamedParametersValidator
 import groovy.transform.TypeChecked
 import groovy.transform.TypeCheckingMode
+import me.biocomp.hubitat_ci.device.child.ChildDeviceRegistry
+import me.biocomp.hubitat_ci.device.child.ChildDeviceWrapperImpl
+import me.biocomp.hubitat_ci.device.child.DeviceChildExecutor
+import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
 
 @TypeChecked
 class HubitatDeviceSandbox {
@@ -47,18 +51,111 @@ class HubitatDeviceSandbox {
         return setupImpl(options)
     }
 
+    @TypeChecked(TypeCheckingMode.SKIP)
     private HubitatDeviceScript setupImpl(Map options) {
         validateAndUpdateSandboxOptions(options)
 
         def validator = readValidator(options)
 
+        def registry = new ChildDeviceRegistry()
+
+        def builderClosure = { Object opOrNamespace, Object typeName = null, Object deviceNetworkId = null, Object hubId = null, Object opts = [:] ->
+            if (opOrNamespace == 'delete') {
+                registry.delete(deviceNetworkId as String)
+                return null
+            }
+            if (opOrNamespace == 'get') {
+                return registry.getByDni(typeName as String)
+            }
+            if (opOrNamespace == 'list') {
+                return registry.listAll()
+            }
+
+            Closure<File> resolver = (Closure<File>) options.childDeviceResolver
+            if (!resolver) throw new IllegalArgumentException("childDeviceResolver is required to build child devices")
+            File deviceFile = resolver(opOrNamespace as String, typeName as String)
+            if (!deviceFile?.exists()) {
+                throw new IllegalArgumentException(
+                    "Could not resolve child device file for namespace='${opOrNamespace}', typeName='${typeName}'"
+                )
+            }
+
+            def sandbox = new HubitatDeviceSandbox(deviceFile)
+            def childRunOptions = [
+                    api: options.childDeviceApi ?: options.api,
+                    validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                    globals: (opts instanceof Map) ? opts.globals : null,
+                    userSettingValues: (opts instanceof Map) ? (opts.settings ?: [:]) : [:],
+                    parent: options.parent
+            ] as Map
+
+            // Merge parent sandbox validation flags into the child so that flags
+            // like Flags.DontRunScript are honored consistently across parent/child.
+            def parentValidationFlags = options.validationFlags
+            if (parentValidationFlags) {
+                def mergedFlags = []
+                mergedFlags.addAll(childRunOptions.validationFlags as Collection)
+                if (parentValidationFlags instanceof Collection) {
+                    mergedFlags.addAll(parentValidationFlags as Collection)
+                } else {
+                    mergedFlags.add(parentValidationFlags)
+                }
+                childRunOptions.validationFlags = mergedFlags.unique()
+            }
+            // Only set withLifecycle if the caller explicitly provided it. Passing
+            // a null value will cause the NamedParametersValidator.boolParameter to
+            // assert (it expects a non-null boolean when the key is present).
+            if (options.containsKey('withLifecycle') && options.withLifecycle != null) {
+                childRunOptions.withLifecycle = options.withLifecycle
+            }
+
+            def childScript = sandbox.run(childRunOptions)
+
+            def dni = deviceNetworkId as String
+            def parentId = (options.parent && options.parent.respondsTo('getId')) ? options.parent.id as Long : null
+            def wrapper = new ChildDeviceWrapperImpl(childScript.device as DeviceWrapper, dni, null, parentId, childScript)
+            registry.add(dni, wrapper, childScript)
+            return wrapper
+        }
+
+        DeviceExecutor effectiveApi
+        if (options.childDeviceResolver && (options.parent instanceof DeviceWrapper)) {
+            effectiveApi = new DeviceChildExecutor(
+                    options.api as DeviceExecutor,
+                    options.parent as DeviceWrapper,
+                    registry,
+                    { a, b, c, d, e -> builderClosure(a, b, c, d, e) }
+            )
+        } else {
+            effectiveApi = options.api as DeviceExecutor
+        }
+
         HubitatDeviceScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
+        // Set base environment before any user-provided customization so closures can
+        // reference parent/globals safely (and so custom metaClass changes don't
+        // interfere with our own initialize() wiring).
+        if (options.parent) {
+            script.setParent(options.parent)
+        }
+
+        if (options.globals) {
+            script.setGlobals(readGlobals(options))
+        }
+
         script.initialize(
-                options.api as DeviceExecutor,
+                effectiveApi,
                 validator,
                 readUserSettingValues(options),
                 options.customizeScriptBeforeRun as Closure)
+
+        if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
+            script.installed()
+        }
+
+        if (options.withLifecycle && script.metaClass.respondsTo(script, 'initialize')) {
+            script.initialize()
+        }
 
         if (!validator.hasFlag(Flags.DontRunScript)) {
             script.run()
@@ -81,11 +178,20 @@ class HubitatDeviceSandbox {
         return options.userSettingValues ? options.userSettingValues as Map : [:]
     }
 
+    private static Map readGlobals(Map options) {
+        return options.globals ? options.globals as Map : [:]
+    }
+
     private static final NamedParametersValidator optionsValidator = NamedParametersValidator.make {
         objParameter("api", notRequired(), canBeNull(), { v -> new Tuple2("DeviceExecutor", v instanceof DeviceExecutor)} )
         objParameter("userSettingValues", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
         objParameter("customizeScriptBeforeRun", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure taking HubitatDeviceScript", v as Closure) })
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
+        objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
+        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("Object", v) })
+        objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
+        boolParameter("withLifecycle", notRequired())
     }
 
     private static void validateAndUpdateSandboxOptions(Map options) {

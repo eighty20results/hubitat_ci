@@ -9,3 +9,4 @@ SubmodulesWithScripts/homebridge-hubitat-tonesto7/smartapps/tonesto7/homebridge-
 SubmodulesWithScripts/Hubitat_iComfort/App/Lennox-iComfort-connect.groovy
 SubmodulesWithScripts/konnected/hubitat/apps/konnected-connect.groovy
 SubmodulesWithScripts/influxdb_logger/influxdb-logger.groovy
+SubmodulesWithScripts/hubitat-homeconnect/apps/HomeConnect.groovy

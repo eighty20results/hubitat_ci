@@ -312,6 +312,17 @@ class ApiExporter {
     }
 
     @CompileStatic
+    private static int normalizeCompareResult(int value) {
+        if (value < 0) {
+            return -1
+        }
+        if (value > 0) {
+            return 1
+        }
+        return 0
+    }
+
+    @CompileStatic
     private static int compareMethodTypes(def first, def second) {
         // Object always matches anything, except for void
         if ((first == Object.class.name && second != void.class.name) ||
@@ -335,7 +346,7 @@ class ApiExporter {
         second = normalizePrimitiveTypes(second)
 
 
-        return first <=> second
+        return normalizeCompareResult((first <=> second) as int)
     }
     /**
      * Loosely compare two method definitions
@@ -352,7 +363,7 @@ class ApiExporter {
             result = firstModifiers.size() <=> secondModifiers.size()
             if (result == 0) {
                 List valuesAndComparators = [
-                        [first.name, second.name, { a, b -> a <=> b }],
+                        [first.name, second.name, { a, b -> normalizeCompareResult((a <=> b) as int) }],
                         [first.returnType, second.returnType, { a, b -> compareMethodTypes(a, b) }],
                 ]
 
@@ -361,7 +372,7 @@ class ApiExporter {
                 }
 
                 for (int m = 0; m != secondModifiers.size(); ++m) {
-                    valuesAndComparators << [firstModifiers[m], secondModifiers[m], { a, b -> a <=> b }]
+                    valuesAndComparators << [firstModifiers[m], secondModifiers[m], { a, b -> normalizeCompareResult((a <=> b) as int) }]
                 }
 
                 for (int i = 0; i != valuesAndComparators.size(); ++i) {

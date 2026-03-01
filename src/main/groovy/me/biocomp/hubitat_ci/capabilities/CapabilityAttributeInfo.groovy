@@ -2,7 +2,6 @@ package me.biocomp.hubitat_ci.capabilities
 
 import groovy.transform.CompileStatic
 
-@CompileStatic
 class CapabilityAttributeList
 {
     HashMap<String, CapabilityAttributeInfo> result = new HashMap<String, CapabilityAttributeInfo>()
@@ -32,7 +31,6 @@ class CapabilityAttributeList
     }
 }
 
-@CompileStatic
 class CapabilityAttributeInfo {
     private static HashSet<String> supportedOptions = ["min", "max"] as HashSet<String>
 
@@ -42,7 +40,7 @@ class CapabilityAttributeInfo {
     }
 
     static Map<String, CapabilityAttributeInfo> makeList(
-            @DelegatesTo(CapabilityAttributeList) Closure add)
+            Closure add)
     {
         def list = new CapabilityAttributeList()
 
@@ -63,7 +61,6 @@ class CapabilityAttributeInfo {
             "BOOLEAN"
     ] as HashSet<String>
 
-    @CompileStatic
     CapabilityAttributeInfo(Map options = [:], String name, String typeString, List<String> values = null)
     {
         assert name

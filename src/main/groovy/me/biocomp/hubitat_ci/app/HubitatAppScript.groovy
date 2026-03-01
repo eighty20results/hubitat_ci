@@ -1,6 +1,8 @@
 package me.biocomp.hubitat_ci.app
 
 import me.biocomp.hubitat_ci.api.app_api.AppExecutor
+import me.biocomp.hubitat_ci.api.common_api.ChildDeviceWrapper
+import me.biocomp.hubitat_ci.api.common_api.InstalledAppWrapper
 import me.biocomp.hubitat_ci.app.preferences.AppPreferencesReader
 import me.biocomp.hubitat_ci.app.preferences.Preferences
 import groovy.transform.CompileStatic
@@ -23,26 +25,45 @@ abstract class HubitatAppScript extends
     private AppSubscriptionReader subscriptionReader = null
     final private List<Closure> validateAfterRun = []
     private AppValidator validator = null
-    private final AppData data = new AppData()
+    private AppData data = new AppData()
+    private Closure childDeviceFactory
+    private Closure childAppFactory
+    private Closure childAppAccessor
 
     private final HashSet<String> existingMethods = InitExistingMethods()
 
     @Delegate
     private AppExecutor api = null
 
-    @CompileStatic
+    private Object parent
+
     private static HashSet<String> InitExistingMethods() {
-        return getMetaClass().methods.collect { m -> m.name } as HashSet<String>;
+        return HubitatAppScript.metaClass.methods.collect { m -> m.name } as HashSet<String>;
     }
 
     @TypeChecked
     @CompileStatic
-    void initialize(HubitatAppScript parent) {
-        this.api = parent.@api
-        this.preferencesReader = parent.@preferencesReader
-        this.definitionReader = parent.@definitionReader
-        this.mappingsReader = parent.@mappingsReader
-        this.userSettingsMap = parent.@userSettingsMap
+    void initializeFromParent(HubitatAppScript parent) {
+        this.api = readPrivateField(parent, 'api') as AppExecutor
+        this.preferencesReader = readPrivateField(parent, 'preferencesReader') as AppPreferencesReader
+        this.definitionReader = readPrivateField(parent, 'definitionReader') as AppDefinitionReader
+        this.mappingsReader = readPrivateField(parent, 'mappingsReader') as AppMappingsReader
+        this.userSettingsMap = readPrivateField(parent, 'userSettingsMap') as Map
+    }
+
+    @CompileStatic
+    private static Object readPrivateField(Object instance, String fieldName) {
+        Class currentClass = instance.getClass()
+        while (currentClass != null) {
+            try {
+                java.lang.reflect.Field field = currentClass.getDeclaredField(fieldName)
+                field.setAccessible(true)
+                return field.get(instance)
+            } catch (NoSuchFieldException ignored) {
+                currentClass = currentClass.getSuperclass()
+            }
+        }
+        throw new MissingFieldException(fieldName, instance.getClass())
     }
 
     private Map<String, Object> injectedMappingHandlerData = [:]
@@ -54,13 +75,22 @@ abstract class HubitatAppScript extends
     }
 
     @CompileStatic
-    void initialize(
+    void initializeScript(
             AppExecutor api,
             AppValidator validator,
             Map userSettingValues,
-            Closure customizeScriptBeforeRun)
+            Closure customizeScriptBeforeRun,
+            Closure childDeviceFactory,
+            Closure childAppFactory,
+            Object parent,
+            Closure childAppAccessor = null)
     {
         customizeScriptBeforeRun?.call(this)
+
+        this.childDeviceFactory = childDeviceFactory
+        this.childAppFactory = childAppFactory
+        this.childAppAccessor = childAppAccessor
+        this.parent = parent
 
         // This guy needs to be first - it checks if its api is null,
         // and then does nothing in subscribe().
@@ -125,6 +155,129 @@ abstract class HubitatAppScript extends
         return mappingsReader
     }
 
+    ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Long hubId, Map options) {
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        return childDeviceFactory(namespace, typeName, deviceNetworkId, hubId, options)
+    }
+
+    ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId) {
+        return addChildDevice(namespace, typeName, deviceNetworkId, null, [:])
+    }
+
+    void deleteChildDevice(String deviceNetworkId) {
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        childDeviceFactory.call('delete', null, deviceNetworkId)
+    }
+
+    List getChildDevices() {
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        List createdChildren = childDeviceFactory.call('list') as List
+        List existingChildren = null
+        try {
+            existingChildren = this.@api?.getChildDevices() as List
+        } catch (Throwable ignored) {
+            existingChildren = null
+        }
+
+        return mergeChildDeviceLists(existingChildren, createdChildren)
+    }
+
+    ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        return childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+    }
+
+    List getAllChildDevices() {
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        List createdChildren = childDeviceFactory.call('list') as List
+        List existingChildren = null
+        try {
+            existingChildren = this.@api?.getAllChildDevices() as List
+        } catch (Throwable ignored) {
+            existingChildren = null
+        }
+        if (existingChildren == null) {
+            try {
+                existingChildren = this.@api?.getChildDevices() as List
+            } catch (Throwable ignored) {
+                existingChildren = null
+            }
+        }
+        return mergeChildDeviceLists(existingChildren, createdChildren)
+    }
+
+    InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {
+        if (childAppFactory == null) {
+            throw new IllegalStateException("Child app factory is not configured")
+        }
+        return childAppFactory(namespace, smartAppVersionName, label, properties)
+    }
+
+    InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label) {
+        return (InstalledAppWrapper)addChildApp(namespace, smartAppVersionName, label, [:])
+    }
+
+    Object getChildApps() {
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
+        return childAppAccessor('list')
+    }
+
+    Object getChildAppById(Long id) {
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
+        return childAppAccessor('get', id)
+    }
+
+    Object getAllChildApps() {
+        return getChildApps()
+    }
+
+    Object getChildAppByLabel(String label) {
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
+        return childAppAccessor('getByLabel', label)
+    }
+
+    void deleteChildApp(Long id) {
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
+        childAppAccessor('delete', id)
+    }
+
+    private static List mergeChildDeviceLists(List existingChildren, List createdChildren) {
+        LinkedHashSet result = new LinkedHashSet()
+        if (existingChildren != null) {
+            result.addAll(existingChildren)
+        }
+        if (createdChildren != null) {
+            result.addAll(createdChildren)
+        }
+        return new ArrayList(result)
+    }
+
+    InstalledAppWrapper getParent() {
+        return this.parent as InstalledAppWrapper
+    }
+
+    void setParent(Object parent) {
+        this.parent = parent
+    }
+
     /*
         Don't let Script base class to redirect properties to binding,
             it causes confusing issues when using non-supported methods and properties.
@@ -140,6 +293,13 @@ abstract class HubitatAppScript extends
             case "params":
                 if (this.@injectedMappingHandlerData != null) {
                     return this.@injectedMappingHandlerData['params']
+                }
+
+                break;
+
+            case "parent":
+                if (this.@parent != null) {
+                    return this.@parent
                 }
 
                 break;

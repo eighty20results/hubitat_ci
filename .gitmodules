@@ -16,3 +16,6 @@
 [submodule "SubmodulesWithScripts/Hubitat"]
 	path = SubmodulesWithScripts/Hubitat
 	url = https://github.com/biocomp/Hubitat.git
+[submodule "SubmodulesWithScripts/hubitat-homeconnect"]
+	path = SubmodulesWithScripts/hubitat-homeconnect
+	url = https://github.com/rfg81/hubitat-homeconnect.git

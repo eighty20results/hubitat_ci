@@ -1,6 +1,7 @@
 package me.biocomp.hubitat_ci.device
 
 import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
+import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
 import me.biocomp.hubitat_ci.device.metadata.Definition
 import me.biocomp.hubitat_ci.device.metadata.DeviceInput
 import me.biocomp.hubitat_ci.device.metadata.DeviceMetadataReader
@@ -23,10 +24,40 @@ abstract class HubitatDeviceScript extends Script
     @Delegate
     private DeviceExecutor api = null
 
+    // Hubitat provides a persistent state map; drivers commonly use it.
+    // In hubitat_ci we delegate state storage to the executor API.
+    @CompileStatic
+    Map getState() {
+        Map s = this.@api?.getState()
+        if (s != null) {
+            return s
+        }
+
+        // Some tests may provide an API mock without getState() stubbing.
+        // Provide a local backing map so `state.foo = ...` keeps working.
+        if (this.@internalState == null) {
+            this.@internalState = [:]
+        }
+        return this.@internalState
+    }
+
+    private Object parent
+
     @CompileStatic
     void initialize(DeviceExecutor api, DeviceValidator validator, Map userSettingValues, Closure customizeScriptBeforeRun)
     {
-        customizeScriptBeforeRun?.call(this)
+        try {
+            customizeScriptBeforeRun?.call(this)
+        } catch (MissingPropertyException e) {
+            // Some tests/scripts dynamically patch metaClass and can trigger Groovy internals
+            // to look up a 'propertyMissing' property on MetaClassImpl. That lookup is not
+            // relevant to hubitat_ci initialization, so we ignore it here.
+            if (e.property != 'propertyMissing') {
+                // Any other MissingPropertyException likely indicates a real bug
+                // in test setup/customization, so rethrow it.
+                throw e
+            }
+        }
 
         this.data = new DeviceData()
 
@@ -67,8 +98,15 @@ abstract class HubitatDeviceScript extends Script
     @CompileStatic
     void hubitatciValidateAfterMethodCall(String methodName)
     {
+        // This call is injected into (nearly) every user-defined method.
+        // During script construction / very early lifecycle (before initialize()),
+        // metadataReader can still be null, so validation must be a no-op.
+        if (this.@metadataReader == null || this.@metadataReader.settings == null) {
+            return
+        }
+
         //println "hubitatciValidateAfterMethodCall(${methodName} called!)"
-        this.metadataReader.settings.validateAfterPreferences(methodName)
+        this.@metadataReader.settings.validateAfterPreferences(methodName)
     }
 
     /*
@@ -84,9 +122,14 @@ abstract class HubitatDeviceScript extends Script
         switch (property) {
             case "metaClass":
                 return getMetaClass();
+            case "parent":
+                if (this.@parent != null) {
+                    return this.@parent
+                }
+                break
         }
 
-        return ScriptUtil.handleGetProperty(property, this, this.@userSettingsMap)
+        return ScriptUtil.handleGetProperty(property, this, this.@userSettingsMap, this.@globals)
     }
 
     /*
@@ -108,4 +151,57 @@ abstract class HubitatDeviceScript extends Script
     }
 
     abstract void scriptBody()
+
+    void setGlobals(Map globals) {
+        this.globals = globals ?: [:]
+    }
+
+    Map getGlobals() { return this.globals }
+
+    void setParent(Object parent) {
+        this.parent = parent
+    }
+
+    Object getParent() {
+        return this.parent
+    }
+
+    private Map internalState = null
+
+    private Map globals = [:]
+
+    @CompileStatic
+    DeviceWrapper getDevice() {
+        // If executor provides it, use that.
+        DeviceWrapper d = null
+        try {
+            d = this.@api?.getDevice() as DeviceWrapper
+        } catch (Throwable ignored) {
+            // Executor may not support getDevice() (e.g. AppExecutor stub used as childDeviceApi);
+            // fall through to the minimal stub below.
+        }
+        if (d != null) {
+            return d
+        }
+
+        // Otherwise, provide a minimal stub.
+        if (this.@fallbackDevice == null) {
+            this.@fallbackDevice = [
+                    getDisplayName: { -> "Device" },
+                    getLabel      : { -> "Device" },
+                    getName       : { -> "Device" },
+                    getDeviceNetworkId: { -> "device" },
+                    getId         : { -> 1L }
+            ] as DeviceWrapper
+        }
+
+        return this.@fallbackDevice
+    }
+
+    private DeviceWrapper fallbackDevice = null
+
+    @CompileStatic
+    Map getSettings() {
+        return this.@userSettingsMap
+    }
 }

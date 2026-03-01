@@ -16,6 +16,16 @@ import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
 * - Methods from BaseScheduler trait (passed through to a BaseScheduler dependency)
 */
 abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughScheduler {
+    private static final groovy.json.JsonSlurper JSON_SLURPER = new groovy.json.JsonSlurper()
+
+    IntegrationDeviceExecutor() {
+        this((BaseScheduler) null)
+    }
+
+    IntegrationDeviceExecutor(Map args) {
+        this(args?.scheduler as BaseScheduler)
+    }
+
     IntegrationDeviceExecutor(BaseScheduler scheduler) {
         this.scheduler = scheduler
     }
@@ -64,6 +74,11 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
     /*****************************************************************
      * END SECTION: Select methods from DeviceExecutor trait
      *****************************************************************/
+
+    @Override
+    def parseJson(String json) {
+        JSON_SLURPER.parseText(json)
+    }
 
     void setSubscribingScript(HubitatDeviceScript script) {
         this.scheduler?.setHandlingObject(script)
