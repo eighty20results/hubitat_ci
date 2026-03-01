@@ -164,7 +164,8 @@ class HubitatAppSandbox {
             def childScript = deviceSandbox.run(childRunOptions)
 
             // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
-            def wrapper = new ChildDeviceWrapperImpl(childScript as DeviceWrapper, dni, parentWrapper?.id, null)
+            def childDeviceWrapper = childScript.device as DeviceWrapper
+            def wrapper = new ChildDeviceWrapperImpl(childDeviceWrapper, dni, parentWrapper?.id, null)
             childDeviceRegistry.add(dni, wrapper, childScript)
             return wrapper
         }
