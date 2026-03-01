@@ -261,7 +261,8 @@ class HubitatAppSandbox {
         script.initializeScript(
                 effectiveApi,
                 validator,
-                readUserSettingValues(options),
+                (Object) parentWrapper,
+                (Closure) childAppAccessor)
                 (Closure) options.customizeScriptBeforeRun,
                 (Closure) childDeviceFactory,
                 (Closure) childAppBuilder,
