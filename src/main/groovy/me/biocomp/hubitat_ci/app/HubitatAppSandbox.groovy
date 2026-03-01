@@ -190,9 +190,9 @@ class HubitatAppSandbox {
 
         Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
             Closure<File> appResolver = (Closure<File>) options.childAppResolver
-            assert appResolver : "childAppResolver is required to build child apps"
+            if (!appResolver) throw new IllegalArgumentException("childAppResolver is required to build child apps")
             File appFile = appResolver(namespace, smartAppVersionName)
-            assert appFile?.exists(): "Could not resolve child app file for ${namespace}:${smartAppVersionName}"
+            if (!appFile?.exists()) throw new IllegalArgumentException("Could not resolve child app file for ${namespace}:${smartAppVersionName}")
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
