@@ -184,7 +184,7 @@ abstract class HubitatDeviceScript extends Script
                     getLabel      : { -> "Device" },
                     getName       : { -> "Device" },
                     getDeviceNetworkId: { -> "device" },
-                    getId         : { -> "device" }
+                    getId         : { -> 1L }
             ] as DeviceWrapper
         }
 
