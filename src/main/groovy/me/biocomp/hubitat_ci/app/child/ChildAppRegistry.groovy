@@ -57,7 +57,7 @@ class ChildAppRegistry {
             }
         } finally {
             order.remove(rec.wrapper)
-            byLabel.values().remove(rec.wrapper)
+            byLabel.remove(rec.wrapper.label)
         }
     }
 
