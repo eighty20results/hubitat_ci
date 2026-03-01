@@ -66,4 +66,45 @@ class ChildDeviceLifecycleSpec extends Specification {
         deviceFile.delete()
         appFile.delete()
     }
+
+    def "default childDeviceResolver finds device file from Scripts/Devices directory"() {
+        given: "a device file placed in the Scripts/Devices directory (as the default resolver searches there)"
+        def scriptsDevicesDir = new File("Scripts/Devices")
+        scriptsDevicesDir.mkdirs()
+        def deviceFile = new File(scriptsDevicesDir, "DefaultResolverTestDevice.groovy")
+        deviceFile.text = """
+            import groovy.transform.Field
+            @Field def installedCalled = false
+            metadata { definition(name: \"Default Resolver Test Device\", namespace: \"test\", author: \"me\") { capability \"Actuator\" } }
+            def installed() { installedCalled = true }
+            def initialize() { }
+            def parse(String s) {}
+        """.stripIndent()
+
+        def appFile = File.createTempFile("parentApp", ".groovy")
+        appFile.text = """
+            definition(name: \"Parent App\", namespace: \"test\", author: \"me\")
+            preferences { }
+            def installed() { addChildDevice('test', 'DefaultResolverTestDevice', 'dni-default') }
+            def initialize() { }
+        """.stripIndent()
+
+        def sandbox = new HubitatAppSandbox(appFile)
+
+        when: "running sandbox without an explicit childDeviceResolver"
+        def script = sandbox.run(api: Stub(me.biocomp.hubitat_ci.api.app_api.AppExecutor),
+                validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                withLifecycle: true,
+                globals: [:])
+
+        then: "the default resolver finds the device from Scripts/Devices and creates the child"
+        script.getChildDevices().size() == 1
+        def child = script.getChildDevice('dni-default')
+        child != null
+        child.getDeviceNetworkId() == 'dni-default'
+
+        cleanup:
+        deviceFile.delete()
+        appFile.delete()
+    }
 }
