@@ -28,6 +28,8 @@ class LoggingCompilationCustomizer extends CompilationCustomizer
         // StringWriter writer = new StringWriter()
         // new AstNodeToScriptVisitor(writer).visitClass(classNode)
         // out.println writer
-        out.println "AST logging disabled (requires groovy-swing)"
+        if (Boolean.getBoolean("hubitat.astLoggingInfo")) {
+            out.println "AST logging disabled (requires groovy-swing)"
+        }
     }
 }
