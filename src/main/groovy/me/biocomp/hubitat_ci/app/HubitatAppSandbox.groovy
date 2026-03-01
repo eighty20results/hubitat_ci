@@ -2,6 +2,7 @@ package me.biocomp.hubitat_ci.app
 
 import groovy.transform.PackageScope
 import me.biocomp.hubitat_ci.api.app_api.AppExecutor
+import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 import me.biocomp.hubitat_ci.app.preferences.Preferences
 import me.biocomp.hubitat_ci.validation.DebuggerDetector
 import me.biocomp.hubitat_ci.validation.Flags

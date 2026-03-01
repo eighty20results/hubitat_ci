@@ -73,6 +73,32 @@ class DeviceSandboxTest extends Specification {
             e.message.contains("Device does not have 'metadata' call")
     }
 
+    def "run() validates definition by default"() {
+        when:
+            new HubitatDeviceSandbox("""
+metadata {
+    definition(name: "n", namespace: "nm", author: "a") {
+    }
+}
+Map parse(String s) { [:] }
+""").run()
+
+        then:
+            AssertionError e = thrown()
+            e.message.contains("at least one capability")
+    }
+
+    def "run(noValidation: true) skips definition and preferences validation"() {
+        expect:
+            new HubitatDeviceSandbox("""
+metadata {
+    definition(name: "n", namespace: "nm", author: "a") {
+    }
+}
+Map parse(String s) { [:] }
+""").run(noValidation: true)
+    }
+
     def "Use device helper to get to Mqtt"() {
         given:
             final def mqtt = Mock(Mqtt)

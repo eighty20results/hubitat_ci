@@ -132,6 +132,17 @@ def on()
             badCapability << [null, "''", "'Im A Bad Capability'"]
     }
 
+    def "Unknown capability is accepted when DontValidateCapabilities is enabled"() {
+        when:
+            def definition = readDefinition([validationFlags: [Flags.DontValidateCapabilities]], """
+    definition(name: "nam", author: 'a', namespace: 'n'){
+        capability 'Im A Capability Not In Catalog'
+    }""")
+
+        then:
+            definition.capabilities == ['Im A Capability Not In Catalog']
+    }
+
     def "There must be at least one capability"() {
         when:
             readDefinition("""

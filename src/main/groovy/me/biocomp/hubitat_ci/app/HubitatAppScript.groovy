@@ -189,10 +189,13 @@ abstract class HubitatAppScript extends
     }
 
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
-        if (childDeviceFactory == null) {
-            throw new IllegalStateException("Child device factory is not configured")
+        assert childDeviceFactory != null: "Child device factory is not configured"
+        final ChildDeviceWrapper createdChild = childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+        if (createdChild != null) {
+            return createdChild
         }
-        return childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
+
+        return this.@api?.getChildDevice(deviceNetworkId) as ChildDeviceWrapper
     }
 
     List getAllChildDevices() {
@@ -271,11 +274,11 @@ abstract class HubitatAppScript extends
     }
 
     InstalledAppWrapper getParent() {
-        return this.parent as InstalledAppWrapper
+        return this.@parent as InstalledAppWrapper
     }
 
     void setParent(Object parent) {
-        this.parent = parent
+        this.@parent = parent
     }
 
     /*

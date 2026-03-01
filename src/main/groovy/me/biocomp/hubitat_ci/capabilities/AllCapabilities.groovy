@@ -1,5 +1,6 @@
 package me.biocomp.hubitat_ci.capabilities
 
+import groovy.transform.CompileStatic
 
 /**
  * Base capability traits, all capabilities derive from it.
@@ -1117,6 +1118,16 @@ interface Valve extends Capability
 
 
     abstract void close()
+}
+
+interface Variable extends Capability
+{
+    static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
+        stringAttribute("variable")
+    }
+
+    @CompileStatic
+    abstract void setVariable(String valueToSet)
 }
 
 // Video Stream

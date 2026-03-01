@@ -55,6 +55,8 @@ class HubitatDeviceSandbox {
     private HubitatDeviceScript setupImpl(Map options) {
         validateAndUpdateSandboxOptions(options)
 
+        // Respect caller-provided validation flags; child sandboxes pass relaxed flags explicitly.
+        options.validationFlags = (options.validationFlags ?: [])
         def validator = readValidator(options)
 
         def registry = new ChildDeviceRegistry()
@@ -149,6 +151,37 @@ class HubitatDeviceSandbox {
                 readUserSettingValues(options),
                 options.customizeScriptBeforeRun as Closure)
 
+        // Ensure 'state' exists even if the provided DeviceExecutor mock doesn't stub getState().
+        try {
+            if (effectiveApi != null && effectiveApi.metaClass.respondsTo(effectiveApi, 'getState')) {
+                def st = effectiveApi.getState()
+                if (st == null) {
+                    def backingState = [:]
+                    effectiveApi.metaClass.getState = { -> backingState }
+                }
+            }
+        } catch (Throwable ignored) {
+            // Best-effort fallback.
+        }
+
+        // Some real-world drivers access `device.displayName` (and friends) during installed()/initialize().
+        // When tests supply a minimal DeviceExecutor mock, getDevice() may be null unless stubbed.
+        // Provide a small default DeviceWrapper so scripts can run lifecycle code safely.
+        try {
+            if (effectiveApi != null && effectiveApi.metaClass.respondsTo(effectiveApi, 'getDevice')) {
+                def currentDevice = effectiveApi.getDevice()
+                if (currentDevice == null) {
+                    def fallbackDevice = [
+                            getDisplayName: { -> "Device" },
+                            getLabel      : { -> "Device" },
+                            getName       : { -> "Device" }
+                    ] as DeviceWrapper
+                    effectiveApi.metaClass.getDevice = { -> fallbackDevice }
+                }
+            }
+        } catch (Throwable ignored) {
+            // Best-effort fallback; ignore if executor implementation forbids metaClass changes.
+        }
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
             script.installed()
         }
@@ -187,6 +220,7 @@ class HubitatDeviceSandbox {
         objParameter("userSettingValues", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
         objParameter("customizeScriptBeforeRun", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure taking HubitatDeviceScript", v as Closure) })
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
+        boolParameter("noValidation", notRequired())
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("Object", v) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
@@ -196,6 +230,10 @@ class HubitatDeviceSandbox {
 
     private static void validateAndUpdateSandboxOptions(Map options) {
         optionsValidator.validate("Validating sandbox options", options, EnumSet.noneOf(Flags))
+
+        if (options.noValidation) {
+            addFlags(options, [Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+        }
     }
 
     static private void addFlags(Map options, List<Flags> flags) {

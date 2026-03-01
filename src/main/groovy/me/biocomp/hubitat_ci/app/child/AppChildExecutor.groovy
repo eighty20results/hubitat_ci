@@ -79,19 +79,24 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
-        return childDeviceRegistry.getByDni(deviceNetworkId)
+        def createdChild = childDeviceRegistry.getByDni(deviceNetworkId)
+        if (createdChild != null) {
+            return createdChild
+        }
+
+        return delegate?.getChildDevice(deviceNetworkId)
     }
 
     @Override
     List getChildDevices() {
-        return mergeChildDeviceLists(delegate.getChildDevices(), childDeviceRegistry.listAll())
+        return mergeChildDeviceLists(delegate?.getChildDevices(), childDeviceRegistry.listAll())
     }
 
     @Override
     List getAllChildDevices() {
-        List delegateDevices = delegate.getAllChildDevices()
+        List delegateDevices = delegate?.getAllChildDevices()
         if (delegateDevices == null) {
-            delegateDevices = delegate.getChildDevices()
+            delegateDevices = delegate?.getChildDevices()
         }
         return mergeChildDeviceLists(delegateDevices, childDeviceRegistry.listAll())
     }

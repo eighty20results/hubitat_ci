@@ -25,7 +25,6 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
     IntegrationDeviceExecutor(Map args) {
         this(args?.scheduler as BaseScheduler)
     }
-
     IntegrationDeviceExecutor(BaseScheduler scheduler) {
         this.scheduler = scheduler
     }
