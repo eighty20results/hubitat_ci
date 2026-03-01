@@ -101,7 +101,17 @@ class HubitatDeviceSandbox {
             return wrapper
         }
 
-        DeviceExecutor effectiveApi = new DeviceChildExecutor(options.api as DeviceExecutor, options.parent as DeviceWrapper, registry, { a,b,c,d,e -> builderClosure(a,b,c,d,e) })
+        DeviceExecutor effectiveApi
+        if (options.childDeviceResolver && (options.parent instanceof DeviceWrapper)) {
+            effectiveApi = new DeviceChildExecutor(
+                    options.api as DeviceExecutor,
+                    options.parent as DeviceWrapper,
+                    registry,
+                    { a, b, c, d, e -> builderClosure(a, b, c, d, e) }
+            )
+        } else {
+            effectiveApi = options.api as DeviceExecutor
+        }
 
         HubitatDeviceScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
