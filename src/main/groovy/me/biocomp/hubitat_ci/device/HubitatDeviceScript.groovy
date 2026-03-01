@@ -48,10 +48,15 @@ abstract class HubitatDeviceScript extends Script
     {
         try {
             customizeScriptBeforeRun?.call(this)
-        } catch (MissingPropertyException ignored) {
+        } catch (MissingPropertyException e) {
             // Some tests/scripts dynamically patch metaClass and can trigger Groovy internals
             // to look up a 'propertyMissing' property on MetaClassImpl. That lookup is not
             // relevant to hubitat_ci initialization, so we ignore it here.
+            if (e.property != 'propertyMissing') {
+                // Any other MissingPropertyException likely indicates a real bug
+                // in test setup/customization, so rethrow it.
+                throw e
+            }
         }
 
         this.data = new DeviceData()
