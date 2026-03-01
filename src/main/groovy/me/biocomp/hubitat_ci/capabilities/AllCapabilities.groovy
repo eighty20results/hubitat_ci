@@ -1,5 +1,6 @@
 package me.biocomp.hubitat_ci.capabilities
 
+import groovy.transform.CompileStatic
 
 /**
  * Base capability traits, all capabilities derive from it.
