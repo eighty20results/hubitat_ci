@@ -184,21 +184,27 @@ class HubitatAppSandbox {
             return wrapper
         }
 
-        def childDeviceFactory = { Object opOrNamespace, Object typeName = null, Object deviceNetworkId = null, Object hubId = null, Object opts = [:] ->
-            if (opOrNamespace == 'delete') {
-                childDeviceRegistry.delete(deviceNetworkId as String)
+        def childDeviceFactory = { Object arg1, Object arg2 = null, Object arg3 = null, Object arg4 = null, Object arg5 = [:] ->
+            if (arg1 == 'delete') {
+                // arg3 is expected to be the device network ID (DNI) for deletion
+                childDeviceRegistry.delete(arg3 as String)
                 return null
             }
-            if (opOrNamespace == 'get') {
-                return childDeviceRegistry.getByDni(typeName as String)
+            if (arg1 == 'get') {
+                // arg2 is expected to be the device network ID (DNI) for lookup
+                return childDeviceRegistry.getByDni(arg2 as String)
             }
-            if (opOrNamespace == 'list') {
+            if (arg1 == 'list') {
                 return childDeviceRegistry.listAll()
             }
 
-            def namespace = opOrNamespace as String
-            def dni = deviceNetworkId as String
-            return buildChildDevice(namespace, typeName as String, dni, hubId as Long, opts as Map)
+            // Creation mode: arg1..arg5 map to namespace, typeName, dni, hubId, and options
+            def namespace = arg1 as String
+            def typeName = arg2 as String
+            def dni = arg3 as String
+            def hubId = arg4 as Long
+            def opts = arg5 as Map
+            return buildChildDevice(namespace, typeName, dni, hubId, opts)
         }
 
         Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
