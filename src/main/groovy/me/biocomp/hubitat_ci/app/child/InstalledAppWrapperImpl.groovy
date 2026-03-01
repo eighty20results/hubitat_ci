@@ -39,6 +39,8 @@ class InstalledAppWrapperImpl implements InstalledAppWrapper {
     Long getParentAppId() { parentAppId }
     String getInstallationState() { "complete" }
 
+    Object getScript() { script }
+
     void setScript(Object script) {
         this.script = script
     }
