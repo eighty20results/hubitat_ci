@@ -249,7 +249,12 @@ class HubitatAppSandbox {
         }
 
         // Wrap executor with child support
-        AppExecutor effectiveApi = new AppChildExecutor(options.api as AppExecutor, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
+        AppExecutor effectiveApi
+        if (options.api) {
+            effectiveApi = new AppChildExecutor(options.api as AppExecutor, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
+        } else {
+            effectiveApi = null
+        }
 
         HubitatAppScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
