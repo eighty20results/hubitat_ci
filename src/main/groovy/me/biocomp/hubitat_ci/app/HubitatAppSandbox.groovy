@@ -93,19 +93,16 @@ class HubitatAppSandbox {
         // Provide a minimal default childDeviceResolver that searches common locations
         if (!options.childDeviceResolver) {
             options.childDeviceResolver = { String namespace, String typeName ->
-                // normalize typeName (strip .groovy if present)
+                // normalize typeName: strip .groovy and any trailing " - description", but keep spaces in the name
                 String tn = typeName
                 if (tn == null) tn = ''
                 // If typeName contains '.groovy' somewhere (e.g. 'name.groovy - description'), extract up to it
                 if (tn.contains('.groovy')) {
                     tn = tn.substring(0, tn.indexOf('.groovy'))
                 }
-                // If still contains a description after ' - ' or whitespace, take the first token
+                // If still contains a description after ' - ', extract just the name part
                 if (tn.contains(' - ')) {
                     tn = tn.split(' - ')[0]
-                }
-                if (tn.contains(' ')) {
-                    tn = tn.split(' ')[0]
                 }
 
                 // Try local src tree first
