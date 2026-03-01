@@ -236,7 +236,8 @@ class HubitatAppSandbox {
                 (Closure) options.customizeScriptBeforeRun,
                 (Closure) childDeviceFactory,
                 (Closure) childAppBuilder,
-                (Object) parentWrapper)
+                (Object) parentWrapper,
+                (Closure) childAppAccessor)
 
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
             script.installed()
