@@ -230,11 +230,11 @@ abstract class HubitatAppScript extends
     }
 
     InstalledAppWrapper getParent() {
-        return this.parent as InstalledAppWrapper
+        return this.@parent as InstalledAppWrapper
     }
 
     void setParent(Object parent) {
-        this.parent = parent
+        this.@parent = parent
     }
 
     /*
