@@ -49,7 +49,7 @@ trait AtomicState {
 
     /**
      *
-     * @retrun The unit of measure for this Event, if applicable
+     * @return The unit of measure for this Event, if applicable
      */
     abstract String getUnit()
 

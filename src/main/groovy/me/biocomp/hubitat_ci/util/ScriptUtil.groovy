@@ -6,6 +6,12 @@ import java.lang.reflect.Method
 
 @CompileStatic
 class ScriptUtil {
+    // A static map for early property initialization (before userSettingsMap is available).
+    // WeakHashMap allows script object keys to be garbage-collected once no longer
+    // strongly referenced, preventing memory leaks across test runs.
+    // synchronizedMap guards all compound read-modify-write operations.
+    private static final Map<Object, Map<String, Object>> earlyInitStore =
+        Collections.synchronizedMap(new WeakHashMap<Object, Map<String, Object>>())
 
     static def handleGetProperty(String property, def scriptObject, Map userSettingsMap, Map globals = null)
     {
@@ -47,16 +53,12 @@ class ScriptUtil {
             return userSettingsMap.get(property)
         }
 
-        // Fall back: check for an internalState map attached to the script (used by tests/sandbox)
-        try {
-            if (scriptMetaClass.hasProperty(scriptObject, 'internalState')) {
-                def internal = scriptMetaClass.getProperty(scriptObject as GroovyObjectSupport, 'internalState')
-                if (internal instanceof Map && internal.containsKey(property)) {
-                    return internal.get(property)
-                }
+        // Fall back: check earlyInitStore for properties set before userSettingsMap was available
+        synchronized (earlyInitStore) {
+            Map<String, Object> earlyProps = earlyInitStore.get(scriptObject)
+            if (earlyProps != null && earlyProps.containsKey(property)) {
+                return earlyProps.get(property)
             }
-        } catch (Throwable ignored) {
-            // best-effort fallback; don't fail if we can't read internalState
         }
 
         return null
@@ -96,25 +98,25 @@ class ScriptUtil {
             return
         }
 
-        // If userSettingsMap is not available yet (early initialization), try safe fallbacks
+        // If userSettingsMap is not available yet (early initialization), use earlyInitStore
         if (userSettingsMap == null) {
-            try {
-                final def scriptMetaClass = scriptObject.getMetaClass()
-                // If metaClass already exposes the property, set it there (this avoids going through setProperty again)
-                if (scriptMetaClass.hasProperty(scriptObject, property)) {
-                    scriptMetaClass.setProperty(scriptObject as GroovyObjectSupport, property, newValue)
-                    return
+            synchronized (earlyInitStore) {
+                if (!earlyInitStore.containsKey(scriptObject)) {
+                    earlyInitStore.put(scriptObject, new HashMap<String, Object>())
                 }
+                earlyInitStore.get(scriptObject).put(property, (Object) newValue)
+            }
+            return
+        }
 
-                // Otherwise, maintain a small internalState map on the script object and store the value there.
-                if (!scriptMetaClass.hasProperty(scriptObject, 'internalState')) {
-                    scriptMetaClass.setProperty(scriptObject as GroovyObjectSupport, 'internalState', [:])
+        // Migrate any early-init properties into userSettingsMap and release the earlyInitStore entry.
+        // The containsKey check avoids acquiring the explicit lock when there is nothing to migrate.
+        if (earlyInitStore.containsKey(scriptObject)) {
+            synchronized (earlyInitStore) {
+                Map<String, Object> earlyProps = earlyInitStore.remove(scriptObject)
+                if (earlyProps != null) {
+                    userSettingsMap.putAll(earlyProps)
                 }
-                def internal = scriptMetaClass.getProperty(scriptObject as GroovyObjectSupport, 'internalState') as Map
-                internal.put(property, newValue)
-                return
-            } catch (Throwable t) {
-                // best-effort; if anything fails fall through to the userSettingsMap path below (which may NPE if still null).
             }
         }
 

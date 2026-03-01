@@ -74,9 +74,13 @@ class HubitatDeviceSandbox {
             }
 
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            assert resolver : "childDeviceResolver is required to build component devices"
+            if (!resolver) throw new IllegalArgumentException("childDeviceResolver is required to build child devices")
             File deviceFile = resolver(opOrNamespace as String, typeName as String)
-            assert deviceFile?.exists(): "Could not resolve component device file for ${opOrNamespace}:${typeName}"
+            if (!deviceFile?.exists()) {
+                throw new IllegalArgumentException(
+                    "Could not resolve child device file for namespace='${opOrNamespace}', typeName='${typeName}'"
+                )
+            }
 
             def sandbox = new HubitatDeviceSandbox(deviceFile)
             def childRunOptions = [
@@ -87,6 +91,19 @@ class HubitatDeviceSandbox {
                     parent: options.parent
             ] as Map
 
+            // Merge parent sandbox validation flags into the child so that flags
+            // like Flags.DontRunScript are honored consistently across parent/child.
+            def parentValidationFlags = options.validationFlags
+            if (parentValidationFlags) {
+                def mergedFlags = []
+                mergedFlags.addAll(childRunOptions.validationFlags as Collection)
+                if (parentValidationFlags instanceof Collection) {
+                    mergedFlags.addAll(parentValidationFlags as Collection)
+                } else {
+                    mergedFlags.add(parentValidationFlags)
+                }
+                childRunOptions.validationFlags = mergedFlags.unique()
+            }
             // Only set withLifecycle if the caller explicitly provided it. Passing
             // a null value will cause the NamedParametersValidator.boolParameter to
             // assert (it expects a non-null boolean when the key is present).
@@ -103,7 +120,17 @@ class HubitatDeviceSandbox {
             return wrapper
         }
 
-        DeviceExecutor effectiveApi = new DeviceChildExecutor(options.api as DeviceExecutor, options.parent as DeviceWrapper, registry, { a,b,c,d,e -> builderClosure(a,b,c,d,e) })
+        DeviceExecutor effectiveApi
+        if (options.childDeviceResolver && (options.parent instanceof DeviceWrapper)) {
+            effectiveApi = new DeviceChildExecutor(
+                    options.api as DeviceExecutor,
+                    options.parent as DeviceWrapper,
+                    registry,
+                    { a, b, c, d, e -> builderClosure(a, b, c, d, e) }
+            )
+        } else {
+            effectiveApi = options.api as DeviceExecutor
+        }
 
         HubitatDeviceScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
@@ -195,7 +222,7 @@ class HubitatDeviceSandbox {
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
         boolParameter("noValidation", notRequired())
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
-        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceWrapper", true) })
+        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("Object", v) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
         boolParameter("withLifecycle", notRequired())

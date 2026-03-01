@@ -47,12 +47,12 @@ class DeviceChildExecutor implements DeviceExecutor {
 
     @Override
     ChildDeviceWrapper addChildDevice(String typeName, String deviceNetworkId, Map properties) {
-        return (ChildDeviceWrapper) childDeviceBuilder?.call(null, typeName, deviceNetworkId, properties)
+        return (ChildDeviceWrapper) childDeviceBuilder?.call(null, typeName, deviceNetworkId, null, properties)
     }
 
     @Override
     ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Map properties) {
-        return (ChildDeviceWrapper) childDeviceBuilder?.call(namespace, typeName, deviceNetworkId, properties)
+        return (ChildDeviceWrapper) childDeviceBuilder?.call(namespace, typeName, deviceNetworkId, null, properties)
     }
 
     @Override

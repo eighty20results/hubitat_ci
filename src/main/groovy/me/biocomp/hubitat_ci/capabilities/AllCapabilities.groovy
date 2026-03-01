@@ -1,11 +1,9 @@
 package me.biocomp.hubitat_ci.capabilities
 
-import groovy.transform.CompileStatic
 
 /**
  * Base capability traits, all capabilities derive from it.
  */
-@CompileStatic
 interface Capability
 {
 }
@@ -18,7 +16,6 @@ interface AccelerationSensor extends Capability
 }
 
 // Deprecated in SmartThings
-@CompileStatic
 interface Actuator extends Capability
 {
 }
@@ -32,22 +29,21 @@ interface Alarm extends Capability
         enumAttribute("alarm", ["strobe", "both", "off", "siren"])
     }
 
-    @CompileStatic
+
     abstract both()
 
-    @CompileStatic
+
     abstract off()
 
-    @CompileStatic
+
     abstract siren()
 
-    @CompileStatic
+
     abstract strobe()
 }
 
 // Only in SmartThings: interface AudioMute{}
 
-@CompileStatic
 interface AudioNotification extends Capability
 {
     /**
@@ -96,22 +92,22 @@ interface AudioVolume extends Capability
         number("volume") // Double
     }
 
-    @CompileStatic
+
     abstract void mute()
 
     /**
     * @param volumeLevel required (NUMBER) - Volume level (0 to 100)
     */
-    @CompileStatic
+
     abstract void setVolume(Double volumeLevel)
 
-    @CompileStatic
+
     abstract void unmute()
 
-    @CompileStatic
+
     abstract void volumeDown()
 
-    @CompileStatic
+
     abstract void volumeUp()
 }
 
@@ -139,10 +135,10 @@ interface Bulb extends Capability
         enumAttribute("switch", ["on", "off"])
     }
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void off()
 }
 
@@ -170,7 +166,6 @@ interface CarbonMonoxideDetector extends Capability
     }
 }
 
-@CompileStatic
 interface ChangeLevel extends Capability
 {
     /**
@@ -188,10 +183,10 @@ interface Chime extends Capability
         enumAttribute("status", ["playing", "stopped"])
     }
 
-    @CompileStatic
+
     abstract void playSound(Number soundNumber)
 
-    @CompileStatic
+
     abstract void stop()
 }
 
@@ -211,19 +206,19 @@ interface ColorControl extends Capability
      * @param colormap required (COLOR_MAP) - Color map settings [hue*:(0 to 100), saturation*:(0 to 100), level:(0 to 100)]
      * @return
      */
-    @CompileStatic
+
     abstract void setColor(Map colorMap)
 
     /**
      * @param hue required (NUMBER) - Color Hue (0 to 100)
      */
-    @CompileStatic
+
     abstract void setHue(Double hue)
 
     /**
      * @param saturation required (NUMBER) - Color Saturation (0 to 100)
      */
-    @CompileStatic
+
     abstract void setSaturation(Double saturation)
 }
 
@@ -242,7 +237,6 @@ interface ColorTemperature extends Capability
     }
 }
 
-@CompileStatic
 interface Configuration extends Capability
 {
     abstract void configure()
@@ -254,7 +248,7 @@ interface Consumable extends Capability
         enumAttribute("consumableStatus", ["missing", "order", "maintenance_required", "good", "replace"])
     }
 
-    @CompileStatic
+
     abstract void setConsumableStatus(String status)
 }
 
@@ -277,10 +271,10 @@ interface DoorControl extends Capability
         enumAttribute("door", ["unknown", "closed", "open", "closing", "opening"])
     }
 
-    @CompileStatic
+
     abstract void open()
 
-    @CompileStatic
+
     abstract void close()
 }
 
@@ -321,7 +315,7 @@ interface FanControl extends Capability
     }
 
 
-    @CompileStatic
+
     abstract void setSpeed(String speed)
 }
 
@@ -338,10 +332,10 @@ interface GarageDoorControl extends Capability
         enumAttribute("door", ["unknown", "open", "closing", "closed", "opening"])
     }
 
-    @CompileStatic
+
     abstract  void close()
 
-    @CompileStatic
+
     abstract  void open()
 }
 
@@ -353,7 +347,7 @@ interface HealthCheck extends Capability
         number("checkInterval")
     }
 
-    @CompileStatic
+
     abstract void ping()
 }
 
@@ -377,7 +371,7 @@ interface ImageCapture extends Capability
         stringAttribute("image")
     }
 
-    @CompileStatic
+
     abstract void take()
 }
 
@@ -388,19 +382,18 @@ interface Indicator extends Capability
         enumAttribute("indicatorStatus", ["never", "when on", "when off"])
     }
 
-    @CompileStatic
+
     abstract void indicatorNever()
 
-    @CompileStatic
+
     abstract void indicatorWhenOff()
 
-    @CompileStatic
+
     abstract void indicatorWhenOn()
 }
 
 // Infrared Level
 
-@CompileStatic
 interface Initialize extends Capability
 {
     abstract static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
@@ -414,10 +407,10 @@ interface Light extends Capability
         enumAttribute("switch", ["on", "off"])
     }
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void off()
 }
 
@@ -431,13 +424,13 @@ interface LightEffects extends Capability
     /**
      * @param effectNumber required (NUMBER) - Effect number to enable
      */
-    @CompileStatic
+
     abstract void setEffect(Number effectNumber)
 
-    @CompileStatic
+
     abstract void setNextEffect()
 
-    @CompileStatic
+
     abstract void setPreviousEffect()
 }
 
@@ -456,10 +449,10 @@ interface Lock extends Capability
         enumAttribute("lock", ["locked", "unlocked with timeout", "unlocked", "unknown"])
     }
 
-    @CompileStatic
+
     abstract void lock()
 
-    @CompileStatic
+
     abstract void unlock()
 }
 
@@ -475,11 +468,11 @@ interface LockCodes extends Capability
     /**
      * @param codePosition required (NUMBER) - Code position number to delete
      */
-    @CompileStatic
+
     abstract void deleteCode(codePosition)
 
 
-    @CompileStatic
+
     abstract void getCodes()
 
     /**
@@ -487,13 +480,13 @@ interface LockCodes extends Capability
      * @param pinCode - required (STRING) - Numeric PIN code
      * @param name - optional (STRING) - Name for this lock code
      */
-    @CompileStatic
+
     abstract void setCode(Number codePosition, String pinCode, String name)
 
     /**
      * @param pinCodeLength required (NUMBER) - Maximum pin code length for this lock
      */
-    @CompileStatic
+
     abstract void setCodeLength(Number pinCodeLength)
 }
 
@@ -512,7 +505,6 @@ interface MediaController extends Capability
 // Media Presets
 // Media Track Control
 
-@CompileStatic
 interface Momentary extends Capability
 {
     abstract void push()
@@ -535,47 +527,47 @@ interface MusicPlayer extends Capability
         stringAttribute("trackDescription")
     }
 
-    @CompileStatic
+
     abstract void mute()
 
-    @CompileStatic
+
     abstract void nextTrack()
 
-    @CompileStatic
+
     abstract void pause()
 
-    @CompileStatic
+
     abstract void play()
 
     /**
      * @param text required (STRING) - Text to play
      */
-    @CompileStatic
+
     abstract void playText(String text)
 
 
     /**
      * @param trackUri (STRING) - URI/URL of track to play
      */
-    @CompileStatic
+
     abstract void playTrack(String trackUri)
 
 
-    @CompileStatic
+
     abstract void previousTrack()
 
     /**
      *
      * @param trackUri required (STRING) - URI/URL of track to restore
      */
-    @CompileStatic
+
     abstract void restoreTrack(trackUri)
 
     /**
      *
      * @param trackUri required (STRING) - URI/URL of track to play
      */
-    @CompileStatic
+
     abstract void resumeTrack(trackUri)
 
 
@@ -583,27 +575,26 @@ interface MusicPlayer extends Capability
      * @param volumeLevel required (NUMBER) - Volume level (0 to 100)
      * @return
      */
-    @CompileStatic
+
     abstract void setLevel(Double volumeLevel)
 
 
     /**
      * @param trackUri required (STRING) - URI/URL of track to set
      */
-    @CompileStatic
+
     abstract void setTrack(trackUri)
 
-    @CompileStatic
+
     abstract void stop()
 
-    @CompileStatic
+
     abstract void unmute()
 }
 
 /**
  * Allows for displaying notifications on devices that allow notifications to be displayed
  */
-@CompileStatic
 interface Notification extends Capability
 {
     abstract void deviceNotification(String text)
@@ -617,10 +608,10 @@ interface Outlet extends Capability
         enumAttribute("switch", ["on", "off"])
     }
 
-    @CompileStatic
+
     abstract void off()
 
-    @CompileStatic
+
     abstract void on()
 }
 
@@ -629,7 +620,6 @@ interface Outlet extends Capability
 // Oven Setpoint
 
 // Deprecated in SmartThings
-@CompileStatic
 interface Polling extends Capability
 {
     abstract void poll()
@@ -678,7 +668,6 @@ interface PushableButton extends Capability {
     }
 }
 
-@CompileStatic
 interface Refresh extends Capability
 {
     abstract void refresh()
@@ -697,10 +686,10 @@ interface RelaySwitch extends Capability
         enumAttribute("switch", ["on", "off"])
     }
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void off()
 }
 
@@ -728,34 +717,34 @@ interface SamsungTV extends Capability
         number("volume") // Double
     }
 
-    @CompileStatic
+
     abstract void mute()
 
-    @CompileStatic
+
     abstract void off()
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void setPictureMode(String mode)
 
-    @CompileStatic
+
     abstract void setSoundMode(String mode)
 
-    @CompileStatic
+
     abstract void setVolume(Double volume)
 
-    @CompileStatic
+
     abstract void showMessage(String a, String b, String c, String d)
 
-    @CompileStatic
+
     abstract void unmute()
 
-    @CompileStatic
+
     abstract void volumeDown()
 
-    @CompileStatic
+
     abstract void volumeUp()
 }
 
@@ -769,10 +758,10 @@ interface SecurityKeypad extends Capability
         enumAttribute("securityKeypad", ["disarmed","armed home","armed away","unknown"])
     }
 
-    @CompileStatic
+
     abstract void armAway()
 
-    @CompileStatic
+
     abstract void armHome()
 
     /**
@@ -780,13 +769,13 @@ interface SecurityKeypad extends Capability
      * @param codePosition required (NUMBER) - Code position number to delete
      * @return
      */
-    @CompileStatic
+
     abstract void deleteCode(Number codePosition)
 
-    @CompileStatic
+
     abstract void disarm()
 
-    @CompileStatic
+
     abstract void getCodes()
 
 
@@ -795,27 +784,26 @@ interface SecurityKeypad extends Capability
      * @param pinCode required (STRING) - Numeric PIN code
      * @param name optional (STRING) - Name for this lock code
      */
-    @CompileStatic
+
     abstract void setCode(codePosition, pinCode, name)
 
     /**
      * @param pinCodeLength required (NUMBER) - Maximum pin code length for this keypad
      */
-    @CompileStatic
+
     abstract void setCodeLength(pinCodeLength)
 
 
-    @CompileStatic
+
     abstract void setEntryDelay(Number entranceDelayInSeconds)
 
     /**
      * @param exitDelay required (NUMBER) - Exit delay in seconds
      */
-    @CompileStatic
+
     abstract void setExitDelay(exitDelay)
 }
 
-@CompileStatic
 interface Sensor extends Capability
 {}
 
@@ -826,7 +814,6 @@ interface ShockSensor extends Capability
     }
 }
 
-@CompileStatic
 interface SignalStrength extends Capability
 {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
@@ -870,7 +857,6 @@ interface SpeechRecognition extends Capability
     }
 }
 
-@CompileStatic
 interface SpeechSynthesis extends Capability
 {
     abstract void speak(String text)
@@ -890,10 +876,10 @@ interface Switch extends Capability
         enumAttribute("switch", ["on", "off"])
     }
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void off()
 }
 
@@ -907,7 +893,7 @@ interface SwitchLevel extends Capability
     * @param level required (NUMBER) - Level to set (0 to 100)
     * @param duration optional (NUMBER) - Transition duration in seconds
     */
-    @CompileStatic
+
     abstract void setLevel(Double level, Number duration)
 }
 
@@ -924,16 +910,16 @@ interface TV extends Capability
         number("volume") // Double
     }
 
-    @CompileStatic
+
     abstract void channelDown()
 
-    @CompileStatic
+
     abstract void channelUp()
 
-    @CompileStatic
+
     abstract void volumeDown()
 
-    @CompileStatic
+
     abstract void volumeUp()
 }
 
@@ -944,7 +930,6 @@ interface TamperAlert extends Capability
     }
 }
 
-@CompileStatic
 interface Telnet extends Capability
 {
 }
@@ -956,10 +941,8 @@ interface TemperatureMeasurement extends Capability
     }
 }
 
-@CompileStatic
 interface TestCapability extends Capability {}
 
-@CompileStatic
 interface Thermostat extends
         ThermostatCoolingSetpoint,
         ThermostatHeatingSetpoint,
@@ -976,7 +959,6 @@ interface Thermostat extends
     }
 }
 
-@CompileStatic
 interface ThermostatCoolingSetpoint extends Capability
 {
     static def _internalAttributes = CapabilityAttributeInfo.makeList {
@@ -987,7 +969,7 @@ interface ThermostatCoolingSetpoint extends Capability
      *
      * @param temperature required (NUMBER) - Cooling setpoint in degrees
      */
-    @CompileStatic
+
     abstract void setCoolingSetpoint(Number temperature)
 }
 
@@ -997,16 +979,16 @@ interface ThermostatFanMode extends Capability
         enumAttribute("thermostatFanMode", ["auto", "circulate", "on"])
     }
 
-    @CompileStatic
+
     abstract void fanAuto()
 
-    @CompileStatic
+
     abstract void fanCirculate()
 
-    @CompileStatic
+
     abstract void fanOn()
 
-    @CompileStatic
+
     abstract void setThermostatFanMode(String fanMode)
 }
 
@@ -1020,7 +1002,7 @@ interface ThermostatHeatingSetpoint extends Capability
      *
      * @param temperature required (NUMBER) - Heating setpoint in degrees
      */
-    @CompileStatic
+
     abstract void setHeatingSetpoint(Number temperature)
 }
 
@@ -1030,22 +1012,22 @@ interface ThermostatMode extends Capability
         enumAttribute("thermostatMode", ["auto", "off", "heat", "emergency heat", "cool"])
     }
 
-    @CompileStatic
+
     abstract void auto()
 
-    @CompileStatic
+
     abstract void cool()
 
-    @CompileStatic
+
     abstract void emergencyHeat()
 
-    @CompileStatic
+
     abstract void heat()
 
-    @CompileStatic
+
     abstract void off()
 
-    @CompileStatic
+
     abstract void setThermostatMode(String mode)
 }
 
@@ -1062,7 +1044,7 @@ interface ThermostatSchedule extends Capability
         jsonObject("schedule")
     }
 
-    @CompileStatic
+
     abstract void setSchedule(def jsonObject)
 }
 
@@ -1087,23 +1069,22 @@ interface TimedSession extends Capability
         number("timeRemaining")
     }
 
-    @CompileStatic
+
     abstract void cancel()
 
-    @CompileStatic
+
     abstract void pause()
 
-    @CompileStatic
+
     abstract void setTimeRemaining(Number time) // Is it NUMBER though?
 
-    @CompileStatic
+
     abstract void start()
 
-    @CompileStatic
+
     abstract void stop()
 }
 
-@CompileStatic
 interface Tone extends Capability
 {
     abstract void beep()
@@ -1131,10 +1112,10 @@ interface Valve extends Capability
         enumAttribute("valve", ["open", "closed"])
     }
 
-    @CompileStatic
+
     abstract void open()
 
-    @CompileStatic
+
     abstract void close()
 }
 
@@ -1160,19 +1141,19 @@ interface VideoCamera extends Capability
         stringAttribute("statusMessage")
     }
 
-    @CompileStatic
+
     abstract void flip()
 
-    @CompileStatic
+
     abstract void mute()
 
-    @CompileStatic
+
     abstract void off()
 
-    @CompileStatic
+
     abstract void on()
 
-    @CompileStatic
+
     abstract void unmute()
 }
 
@@ -1207,13 +1188,13 @@ interface WindowShade extends Capability {
         enumAttribute("windowShade", ["open","closed","partially open","opening","closing","unknown"])
         number("position")
     }
-    @CompileStatic
+
     abstract void open()
-    @CompileStatic
+
     abstract void close()
-    @CompileStatic
+
     abstract void pause()
-    @CompileStatic
+
     abstract void setPosition(Number position)
 }
 
@@ -1224,10 +1205,10 @@ interface ZwMultichannel extends Capability
         stringAttribute("epInfo")
     }
 
-    @CompileStatic
+
     abstract void enableEpEvents(String a)
 
-    @CompileStatic
+
     abstract void epCmd(Number a, String b)
 }
 
@@ -1265,10 +1246,10 @@ interface MediaPlayback extends Capability {
     static Map<String, CapabilityAttributeInfo> _internalAttributes = CapabilityAttributeInfo.makeList{
         enumAttribute("playbackStatus", ["stopped","playing","paused"])
     }
-    @CompileStatic
+
     abstract void play()
-    @CompileStatic
+
     abstract void pause()
-    @CompileStatic
+
     abstract void stop()
 }

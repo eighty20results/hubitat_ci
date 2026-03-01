@@ -37,9 +37,8 @@ abstract class HubitatAppScript extends
 
     private Object parent
 
-    @CompileStatic
     private static HashSet<String> InitExistingMethods() {
-        return getMetaClass().methods.collect { m -> m.name } as HashSet<String>;
+        return HubitatAppScript.metaClass.methods.collect { m -> m.name } as HashSet<String>;
     }
 
     @TypeChecked
@@ -157,7 +156,9 @@ abstract class HubitatAppScript extends
     }
 
     ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Long hubId, Map options) {
-        assert childDeviceFactory != null: "Child device factory is not configured"
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
         return childDeviceFactory(namespace, typeName, deviceNetworkId, hubId, options)
     }
 
@@ -166,8 +167,10 @@ abstract class HubitatAppScript extends
     }
 
     void deleteChildDevice(String deviceNetworkId) {
-        assert childDeviceFactory != null: "Child device factory is not configured"
-        childDeviceFactory.call('delete', deviceNetworkId)
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        childDeviceFactory.call('delete', null, deviceNetworkId)
     }
 
     List getChildDevices() {
@@ -217,7 +220,9 @@ abstract class HubitatAppScript extends
     }
 
     InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {
-        assert childAppFactory != null: "Child app factory is not configured"
+        if (childAppFactory == null) {
+            throw new IllegalStateException("Child app factory is not configured")
+        }
         return childAppFactory(namespace, smartAppVersionName, label, properties)
     }
 
@@ -226,12 +231,16 @@ abstract class HubitatAppScript extends
     }
 
     Object getChildApps() {
-        assert childAppAccessor != null: "Child app accessor is not configured"
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
         return childAppAccessor('list')
     }
 
     Object getChildAppById(Long id) {
-        assert childAppAccessor != null: "Child app accessor is not configured"
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
         return childAppAccessor('get', id)
     }
 
@@ -240,12 +249,16 @@ abstract class HubitatAppScript extends
     }
 
     Object getChildAppByLabel(String label) {
-        assert childAppAccessor != null: "Child app accessor is not configured"
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
         return childAppAccessor('getByLabel', label)
     }
 
     void deleteChildApp(Long id) {
-        assert childAppAccessor != null: "Child app accessor is not configured"
+        if (childAppAccessor == null) {
+            throw new IllegalStateException("Child app accessor is not configured")
+        }
         childAppAccessor('delete', id)
     }
 

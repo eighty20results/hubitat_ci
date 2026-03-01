@@ -39,12 +39,14 @@ class InstalledAppWrapperImpl implements InstalledAppWrapper {
     Long getParentAppId() { parentAppId }
     String getInstallationState() { "complete" }
 
+    Object getScript() { script }
+
     void setScript(Object script) {
         this.script = script
     }
 
     def methodMissing(String name, args) {
-        if (script && script.respondsTo(name)) {
+        if (script && script.metaClass.respondsTo(script, name, args as Object[])) {
             return script."$name"(*args)
         }
         throw new MissingMethodException(name, this.class, args)

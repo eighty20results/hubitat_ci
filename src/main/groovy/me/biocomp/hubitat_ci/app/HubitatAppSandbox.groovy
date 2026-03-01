@@ -16,7 +16,9 @@ import me.biocomp.hubitat_ci.app.child.InstalledAppWrapperImpl
 import me.biocomp.hubitat_ci.device.child.ChildDeviceRegistry
 import me.biocomp.hubitat_ci.device.child.ChildDeviceWrapperImpl
 import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
+import me.biocomp.hubitat_ci.device.HubitatDeviceScript
 import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
+import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 
 /**
  * This sandbox can load script from file or string,
@@ -84,7 +86,7 @@ class HubitatAppSandbox {
         def childDeviceRegistry = new ChildDeviceRegistry()
         def childAppRegistry = new ChildAppRegistry()
 
-        InstalledAppWrapperImpl parentWrapper = options.parent as InstalledAppWrapperImpl
+        def parentWrapper = options.parent
         if (!parentWrapper) {
             parentWrapper = new InstalledAppWrapperImpl(nextAppId(), "App", "App", null)
         }
@@ -92,31 +94,30 @@ class HubitatAppSandbox {
         // Provide a minimal default childDeviceResolver that searches common locations
         if (!options.childDeviceResolver) {
             options.childDeviceResolver = { String namespace, String typeName ->
-                // normalize typeName (strip .groovy if present)
+                // normalize typeName: strip .groovy and any trailing " - description", but keep spaces in the name
                 String tn = typeName
                 if (tn == null) tn = ''
                 // If typeName contains '.groovy' somewhere (e.g. 'name.groovy - description'), extract up to it
                 if (tn.contains('.groovy')) {
                     tn = tn.substring(0, tn.indexOf('.groovy'))
                 }
-                // If still contains a description after ' - ' or whitespace, take the first token
+                // If still contains a description after ' - ', extract just the name part
                 if (tn.contains(' - ')) {
                     tn = tn.split(' - ')[0]
                 }
-                if (tn.contains(' ')) {
-                    tn = tn.split(' ')[0]
-                }
+
+                // normalize namespace: treat null as empty, and replace dots with slashes for path components
+                String ns = namespace ?: ''
+                String nsPath = ns.replace('.', '/')
 
                 // Try local src tree first
                 def candidatePaths = [
-                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
-                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/drivers/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/Drivers/${tn}.groovy",
+                        "src/main/groovy/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/drivers/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/Drivers/${tn}.groovy",
                         "Scripts/Devices/${tn}.groovy",
-                        "Scripts/Devices/${namespace}/${tn}.groovy",
-                        "Scripts/Devices/${tn}.groovy"
+                        "Scripts/Devices/${nsPath}/${tn}.groovy"
                 ]
 
                 for (p in candidatePaths) {
@@ -126,9 +127,31 @@ class HubitatAppSandbox {
 
                 // As a last resort, try searching Scripts/Devices for files whose name contains tn
                 def scriptsDir = new File('Scripts/Devices')
-                if (scriptsDir.exists()) {
-                    for (f in scriptsDir.listFiles()) {
-                        if (f.name.contains(tn)) return f
+                if (scriptsDir.exists() && tn) {
+                    def files = scriptsDir.listFiles()
+                    if (files != null) {
+                        List<File> matchingFiles = []
+                        for (f in files) {
+                            // Skip directories and other non-regular files
+                            if (!f.isFile()) {
+                                continue
+                            }
+                            if (f.name.contains(tn)) {
+                                matchingFiles << f
+                            }
+                        }
+                        if (!matchingFiles.isEmpty()) {
+                            // Sort by name to ensure deterministic order
+                            matchingFiles.sort { it.name }
+                            if (matchingFiles.size() == 1) {
+                                return matchingFiles[0]
+                            }
+                            throw new IllegalStateException(
+                                    "Multiple candidate device driver files found for typeName '${typeName}' " +
+                                            "(normalized to '${tn}') in Scripts/Devices: " +
+                                            matchingFiles.collect { it.name }.join(', ')
+                            )
+                        }
                     }
                 }
 
@@ -138,9 +161,13 @@ class HubitatAppSandbox {
 
         Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            assert resolver : "childDeviceResolver is required to build child devices"
+            if (resolver == null) {
+                throw new IllegalStateException("childDeviceResolver is required to build child devices")
+            }
             File deviceFile = resolver(namespace, typeName)
-            assert deviceFile?.exists(): "Could not resolve child device file for ${namespace}:${typeName}"
+            if (!(deviceFile?.exists())) {
+                throw new IllegalStateException("Could not resolve child device file for ${namespace}:${typeName}")
+            }
 
             // Merge validation flags so child device respects parent flags (including DontRunScript)
             def childValidationFlags = [] as List<Flags>
@@ -179,34 +206,48 @@ class HubitatAppSandbox {
             return wrapper
         }
 
-        def childDeviceFactory = { Object opOrNamespace, Object typeName = null, Object deviceNetworkId = null, Object hubId = null, Object opts = [:] ->
-            if (opOrNamespace == 'delete') {
-                childDeviceRegistry.delete(deviceNetworkId as String)
+        def childDeviceFactory = { Object arg1, Object arg2 = null, Object arg3 = null, Object arg4 = null, Object arg5 = [:] ->
+            if (arg1 == 'delete') {
+                // arg3 is expected to be the device network ID (DNI) for deletion
+                childDeviceRegistry.delete(arg3 as String)
                 return null
             }
-            if (opOrNamespace == 'get') {
-                return childDeviceRegistry.getByDni(typeName as String)
+            if (arg1 == 'get') {
+                // arg2 is expected to be the device network ID (DNI) for lookup
+                return childDeviceRegistry.getByDni(arg2 as String)
             }
-            if (opOrNamespace == 'list') {
+            if (arg1 == 'list') {
                 return childDeviceRegistry.listAll()
             }
 
-            def namespace = opOrNamespace as String
-            def dni = deviceNetworkId as String
-            return buildChildDevice(namespace, typeName as String, dni, hubId as Long, opts as Map)
+            // Creation mode: arg1..arg5 map to namespace, typeName, dni, hubId, and options
+            def namespace = arg1 as String
+            def typeName = arg2 as String
+            def dni = arg3 as String
+            def hubId = arg4 as Long
+            def opts = arg5 as Map
+            return buildChildDevice(namespace, typeName, dni, hubId, opts)
         }
 
         Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
             Closure<File> appResolver = (Closure<File>) options.childAppResolver
-            assert appResolver : "childAppResolver is required to build child apps"
+            if (!appResolver) throw new IllegalArgumentException("childAppResolver is required to build child apps")
             File appFile = appResolver(namespace, smartAppVersionName)
-            assert appFile?.exists(): "Could not resolve child app file for ${namespace}:${smartAppVersionName}"
+            if (!appFile?.exists()) throw new IllegalArgumentException("Could not resolve child app file for ${namespace}:${smartAppVersionName}")
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
+
+            // Merge validation flags so child app respects parent flags (including DontRunScript)
+            def childAppValidationFlags = [] as List<Flags>
+            childAppValidationFlags.addAll([Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+            if (options.validationFlags) {
+                childAppValidationFlags.addAll(options.validationFlags as List<Flags>)
+            }
+
             def childAppRunOptions = [
                     api: options.childAppApi ?: options.api,
-                    validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                    validationFlags: childAppValidationFlags,
                     parent: childParentWrapper,
                     childDeviceResolver: options.childDeviceResolver,
                     childAppResolver: options.childAppResolver
@@ -217,6 +258,10 @@ class HubitatAppSandbox {
             }
 
             def childScript = appSandbox.run(childAppRunOptions)
+
+            if (childParentWrapper.respondsTo('setScript')) {
+                childParentWrapper.setScript(childScript)
+            }
 
             childAppRegistry.add(childParentWrapper.id, childParentWrapper, childScript)
             return childParentWrapper
@@ -232,7 +277,12 @@ class HubitatAppSandbox {
         }
 
         // Wrap executor with child support
-        AppExecutor effectiveApi = new AppChildExecutor(options.api as AppExecutor, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
+        AppExecutor effectiveApi
+        if (options.api) {
+            effectiveApi = new AppChildExecutor(options.api as AppExecutor, parentWrapper, childDeviceRegistry, { a,b,c,d,e -> childDeviceFactory(a,b,c,d,e) }, childAppBuilder, childAppRegistry)
+        } else {
+            effectiveApi = null
+        }
 
         HubitatAppScript script = file ? validator.parseScript(file) : validator.parseScript(text);
 
@@ -248,7 +298,8 @@ class HubitatAppSandbox {
                 (Closure) options.customizeScriptBeforeRun,
                 (Closure) childDeviceFactory,
                 (Closure) childAppBuilder,
-                (Object) parentWrapper)
+                (Object) parentWrapper,
+                (Closure) childAppAccessor)
 
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
             script.installed()

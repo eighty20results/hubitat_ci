@@ -7,9 +7,16 @@ trait AtomicState
     void finalValidation() {}
 
     @Override
-    boolean equals(def otherState)
+    boolean equals(Object otherState)
     {
-        return id == (otherState as AtomicState).id
+        if (this.is(otherState)) {
+            return true
+        }
+        if (!(otherState instanceof AtomicState)) {
+            return false
+        }
+        AtomicState other = (AtomicState) otherState
+        return this.id == other.id
     }
 
     @Override

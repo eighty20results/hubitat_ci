@@ -48,10 +48,15 @@ abstract class HubitatDeviceScript extends Script
     {
         try {
             customizeScriptBeforeRun?.call(this)
-        } catch (MissingPropertyException ignored) {
+        } catch (MissingPropertyException e) {
             // Some tests/scripts dynamically patch metaClass and can trigger Groovy internals
             // to look up a 'propertyMissing' property on MetaClassImpl. That lookup is not
             // relevant to hubitat_ci initialization, so we ignore it here.
+            if (e.property != 'propertyMissing') {
+                // Any other MissingPropertyException likely indicates a real bug
+                // in test setup/customization, so rethrow it.
+                throw e
+            }
         }
 
         this.data = new DeviceData()
@@ -124,10 +129,6 @@ abstract class HubitatDeviceScript extends Script
                 break
         }
 
-        if (this.@globals != null && this.@globals.containsKey(property)) {
-            return this.@globals.get(property)
-        }
-
         return ScriptUtil.handleGetProperty(property, this, this.@userSettingsMap, this.@globals)
     }
 
@@ -172,9 +173,15 @@ abstract class HubitatDeviceScript extends Script
     @CompileStatic
     DeviceWrapper getDevice() {
         // If executor provides it, use that.
-        def d = this.@api?.getDevice()
+        DeviceWrapper d = null
+        try {
+            d = this.@api?.getDevice() as DeviceWrapper
+        } catch (Throwable ignored) {
+            // Executor may not support getDevice() (e.g. AppExecutor stub used as childDeviceApi);
+            // fall through to the minimal stub below.
+        }
         if (d != null) {
-            return d as DeviceWrapper
+            return d
         }
 
         // Otherwise, provide a minimal stub.
@@ -184,7 +191,7 @@ abstract class HubitatDeviceScript extends Script
                     getLabel      : { -> "Device" },
                     getName       : { -> "Device" },
                     getDeviceNetworkId: { -> "device" },
-                    getId         : { -> "device" }
+                    getId         : { -> 1L }
             ] as DeviceWrapper
         }
 
