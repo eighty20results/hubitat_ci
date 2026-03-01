@@ -111,13 +111,11 @@ class HubitatAppSandbox {
                 // Try local src tree first
                 def candidatePaths = [
                         "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
-                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
                         "SubmodulesWithScripts/${namespace}/${tn}.groovy",
                         "SubmodulesWithScripts/${namespace}/drivers/${tn}.groovy",
                         "SubmodulesWithScripts/${namespace}/Drivers/${tn}.groovy",
                         "Scripts/Devices/${tn}.groovy",
-                        "Scripts/Devices/${namespace}/${tn}.groovy",
-                        "Scripts/Devices/${tn}.groovy"
+                        "Scripts/Devices/${namespace}/${tn}.groovy"
                 ]
 
                 for (p in candidatePaths) {
