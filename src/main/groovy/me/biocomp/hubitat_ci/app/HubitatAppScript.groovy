@@ -152,7 +152,7 @@ abstract class HubitatAppScript extends
 
     void deleteChildDevice(String deviceNetworkId) {
         assert childDeviceFactory != null: "Child device factory is not configured"
-        childDeviceFactory.call('delete', deviceNetworkId)
+        childDeviceFactory.call('delete', null, deviceNetworkId)
     }
 
     List getChildDevices() {
