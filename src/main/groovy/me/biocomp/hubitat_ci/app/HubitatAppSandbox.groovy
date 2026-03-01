@@ -2,6 +2,7 @@ package me.biocomp.hubitat_ci.app
 
 import groovy.transform.PackageScope
 import me.biocomp.hubitat_ci.api.app_api.AppExecutor
+import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 import me.biocomp.hubitat_ci.app.preferences.Preferences
 import me.biocomp.hubitat_ci.validation.DebuggerDetector
 import me.biocomp.hubitat_ci.validation.Flags
@@ -301,7 +302,7 @@ class HubitatAppSandbox {
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
-        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
         objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
          boolParameter("withLifecycle", notRequired())
