@@ -141,7 +141,9 @@ abstract class HubitatAppScript extends
     }
 
     ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Long hubId, Map options) {
-        assert childDeviceFactory != null: "Child device factory is not configured"
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
         return childDeviceFactory(namespace, typeName, deviceNetworkId, hubId, options)
     }
 
@@ -150,17 +152,23 @@ abstract class HubitatAppScript extends
     }
 
     void deleteChildDevice(String deviceNetworkId) {
-        assert childDeviceFactory != null: "Child device factory is not configured"
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
         childDeviceFactory.call('delete', null, deviceNetworkId)
     }
 
     List getChildDevices() {
-        assert childDeviceFactory != null: "Child device factory is not configured"
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
         return childDeviceFactory.call('list') as List
     }
 
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
-        assert childDeviceFactory != null: "Child device factory is not configured"
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
         return childDeviceFactory.call('get', deviceNetworkId) as ChildDeviceWrapper
     }
 
