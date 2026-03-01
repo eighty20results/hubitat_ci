@@ -169,6 +169,8 @@ class MyDishwasherDriverSpec extends Specification {
             }
         )
 
+        // Set the device for the driver
+        // driver.device is now deviceWrapper
         // Mocking the machine program listing
         String programListJson = "[\"Eco\", \"Intensive\"]"
         deviceWrapper.currentValue("AvailableProgramsList") >> programListJson
