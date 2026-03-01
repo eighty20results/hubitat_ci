@@ -214,6 +214,10 @@ class HubitatAppSandbox {
 
             def childScript = appSandbox.run(childAppRunOptions)
 
+            if (childParentWrapper.respondsTo('setScript')) {
+                childParentWrapper.setScript(childScript)
+            }
+
             childAppRegistry.add(childParentWrapper.id, childParentWrapper, childScript)
             return childParentWrapper
         }
