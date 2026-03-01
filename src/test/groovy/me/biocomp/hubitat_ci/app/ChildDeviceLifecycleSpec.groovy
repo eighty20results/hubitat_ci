@@ -20,7 +20,6 @@
 
 package me.biocomp.hubitat_ci.app
 
-import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
 import me.biocomp.hubitat_ci.validation.Flags
 import spock.lang.Specification
 
