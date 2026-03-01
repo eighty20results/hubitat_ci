@@ -103,7 +103,26 @@ class ChildDeviceLifecycleSpec extends Specification {
         child.getDeviceNetworkId() == 'dni-default'
 
         cleanup:
-        deviceFile.delete()
-        appFile.delete()
+        if (deviceFile?.exists()) {
+            deviceFile.delete()
+        }
+        if (appFile?.exists()) {
+            appFile.delete()
+        }
+        // Remove Scripts/Devices directory if this test created it and it is now empty
+        if (scriptsDevicesDir?.exists()) {
+            def children = scriptsDevicesDir.listFiles()
+            if (children == null || children.length == 0) {
+                scriptsDevicesDir.delete()
+            }
+        }
+        // Also clean up parent Scripts directory if it became empty
+        def scriptsDir = scriptsDevicesDir?.parentFile
+        if (scriptsDir?.exists()) {
+            def scriptsChildren = scriptsDir.listFiles()
+            if (scriptsChildren == null || scriptsChildren.length == 0) {
+                scriptsDir.delete()
+            }
+        }
     }
 }
