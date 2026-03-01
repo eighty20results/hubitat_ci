@@ -57,7 +57,10 @@ class ChildDeviceLifecycleSpec extends Specification {
 
         then:
         script.getChildDevices().size() == 1
-        script.getChildDevice('dni-1') != null
+        def child = script.getChildDevice('dni-1')
+        child != null
+        child.script.installedCalled
+        child.script.initializeCalled
 
         cleanup:
         deviceFile.delete()
