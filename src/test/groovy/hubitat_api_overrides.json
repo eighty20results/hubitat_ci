@@ -128,7 +128,7 @@
         ]
     },
     {
-        "class_name": "com.hubitat.AtomicState",
+        "class_name": "com.hubitat.hub.domain.AtomicState",
         "methods": [
             {"returnType": "java.lang.String", "name": "getDataType", "parameters": []},
             {"returnType": "java.util.Date", "name": "getDate", "parameters": []},
