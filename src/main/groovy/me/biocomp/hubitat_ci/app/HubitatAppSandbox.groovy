@@ -175,9 +175,17 @@ class HubitatAppSandbox {
                 childValidationFlags.addAll(options.validationFlags as List<Flags>)
             }
 
+            DeviceExecutor childDeviceApi = null
+            if (options.childDeviceApi instanceof DeviceExecutor) {
+                childDeviceApi = options.childDeviceApi as DeviceExecutor
+            } else if (options.api instanceof DeviceExecutor) {
+                // Support uncommon cases where a shared executor implements both interfaces.
+                childDeviceApi = options.api as DeviceExecutor
+            }
+
             def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
             def childRunOptions = [
-                    api: options.childDeviceApi ?: options.api,
+                    api: childDeviceApi,
                     validationFlags: childValidationFlags,
                     globals: opts?.globals ?: (options.globals ?: [:]),
                     userSettingValues: opts?.settings ?: [:],
@@ -192,7 +200,7 @@ class HubitatAppSandbox {
 
             // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
             def childDeviceWrapper = childScript.device as DeviceWrapper
-            def wrapper = new ChildDeviceWrapperImpl(childDeviceWrapper, dni, parentWrapper?.id, null)
+            def wrapper = new ChildDeviceWrapperImpl(childDeviceWrapper, dni, parentWrapper?.id, null, childScript)
             childDeviceRegistry.add(dni, wrapper, childScript)
             return wrapper
         }
@@ -340,7 +348,7 @@ class HubitatAppSandbox {
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
-        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v instanceof DeviceExecutor) })
         objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
          boolParameter("withLifecycle", notRequired())

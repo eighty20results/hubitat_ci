@@ -84,12 +84,16 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     List getChildDevices() {
-        return childDeviceRegistry.listAll()
+        return mergeChildDeviceLists(delegate.getChildDevices(), childDeviceRegistry.listAll())
     }
 
     @Override
     List getAllChildDevices() {
-        return getChildDevices()
+        List delegateDevices = delegate.getAllChildDevices()
+        if (delegateDevices == null) {
+            delegateDevices = delegate.getChildDevices()
+        }
+        return mergeChildDeviceLists(delegateDevices, childDeviceRegistry.listAll())
     }
 
     @Override
@@ -124,5 +128,16 @@ class AppChildExecutor implements AppExecutor {
     @Override
     InstalledAppWrapper getParent() {
         return parent
+    }
+
+    private static List mergeChildDeviceLists(List existingChildren, List createdChildren) {
+        LinkedHashSet result = new LinkedHashSet()
+        if (existingChildren != null) {
+            result.addAll(existingChildren)
+        }
+        if (createdChildren != null) {
+            result.addAll(createdChildren)
+        }
+        return new ArrayList(result)
     }
 }

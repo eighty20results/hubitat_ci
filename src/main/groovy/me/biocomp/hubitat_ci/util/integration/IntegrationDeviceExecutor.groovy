@@ -18,6 +18,14 @@ import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
 abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughScheduler {
     private static final groovy.json.JsonSlurper JSON_SLURPER = new groovy.json.JsonSlurper()
 
+    IntegrationDeviceExecutor() {
+        this((BaseScheduler) null)
+    }
+
+    IntegrationDeviceExecutor(Map args) {
+        this(args?.scheduler as BaseScheduler)
+    }
+
     IntegrationDeviceExecutor(BaseScheduler scheduler) {
         this.scheduler = scheduler
     }
