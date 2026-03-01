@@ -92,16 +92,16 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     List getChildDevices() {
-        def createdChildren = childDeviceRegistry.listAll()
-        def delegatedChildren = delegate?.getChildDevices() ?: []
-        return mergeUnique(createdChildren, delegatedChildren)
+        return mergeChildDeviceLists(delegate?.getChildDevices(), childDeviceRegistry.listAll())
     }
 
     @Override
     List getAllChildDevices() {
-        def createdChildren = childDeviceRegistry.listAll()
-        def delegatedChildren = delegate?.getAllChildDevices() ?: []
-        return mergeUnique(createdChildren, delegatedChildren)
+        List delegateDevices = delegate?.getAllChildDevices()
+        if (delegateDevices == null) {
+            delegateDevices = delegate?.getChildDevices()
+        }
+        return mergeChildDeviceLists(delegateDevices, childDeviceRegistry.listAll())
     }
 
     @Override
@@ -141,21 +141,14 @@ class AppChildExecutor implements AppExecutor {
         return parent
     }
 
-    @CompileStatic
-    private static List mergeUnique(List first, List second) {
-        final List merged = []
-        for (Object child in (first ?: [])) {
-            if (!merged.contains(child)) {
-                merged.add(child)
-            }
+    private static List mergeChildDeviceLists(List existingChildren, List createdChildren) {
+        LinkedHashSet result = new LinkedHashSet()
+        if (existingChildren != null) {
+            result.addAll(existingChildren)
         }
-
-        for (Object child in (second ?: [])) {
-            if (!merged.contains(child)) {
-                merged.add(child)
-            }
+        if (createdChildren != null) {
+            result.addAll(createdChildren)
         }
-
-        return merged
+        return new ArrayList(result)
     }
 }

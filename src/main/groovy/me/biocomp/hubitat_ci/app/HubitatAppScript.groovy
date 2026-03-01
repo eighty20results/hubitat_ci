@@ -45,11 +45,26 @@ abstract class HubitatAppScript extends
     @TypeChecked
     @CompileStatic
     void initializeFromParent(HubitatAppScript parent) {
-        this.api = parent.@api
-        this.preferencesReader = parent.@preferencesReader
-        this.definitionReader = parent.@definitionReader
-        this.mappingsReader = parent.@mappingsReader
-        this.userSettingsMap = parent.@userSettingsMap
+        this.api = readPrivateField(parent, 'api') as AppExecutor
+        this.preferencesReader = readPrivateField(parent, 'preferencesReader') as AppPreferencesReader
+        this.definitionReader = readPrivateField(parent, 'definitionReader') as AppDefinitionReader
+        this.mappingsReader = readPrivateField(parent, 'mappingsReader') as AppMappingsReader
+        this.userSettingsMap = readPrivateField(parent, 'userSettingsMap') as Map
+    }
+
+    @CompileStatic
+    private static Object readPrivateField(Object instance, String fieldName) {
+        Class currentClass = instance.getClass()
+        while (currentClass != null) {
+            try {
+                java.lang.reflect.Field field = currentClass.getDeclaredField(fieldName)
+                field.setAccessible(true)
+                return field.get(instance)
+            } catch (NoSuchFieldException ignored) {
+                currentClass = currentClass.getSuperclass()
+            }
+        }
+        throw new MissingFieldException(fieldName, instance.getClass())
     }
 
     private Map<String, Object> injectedMappingHandlerData = [:]
@@ -156,10 +171,18 @@ abstract class HubitatAppScript extends
     }
 
     List getChildDevices() {
-        assert childDeviceFactory != null: "Child device factory is not configured"
-        final List createdChildren = (childDeviceFactory.call('list') ?: []) as List
-        final List delegatedChildren = (this.@api?.getChildDevices() ?: []) as List
-        return mergeUniqueChildren(createdChildren, delegatedChildren)
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        List createdChildren = childDeviceFactory.call('list') as List
+        List existingChildren = null
+        try {
+            existingChildren = this.@api?.getChildDevices() as List
+        } catch (Throwable ignored) {
+            existingChildren = null
+        }
+
+        return mergeChildDeviceLists(existingChildren, createdChildren)
     }
 
     ChildDeviceWrapper getChildDevice(String deviceNetworkId) {
@@ -173,27 +196,24 @@ abstract class HubitatAppScript extends
     }
 
     List getAllChildDevices() {
-        assert childDeviceFactory != null: "Child device factory is not configured"
-        final List createdChildren = (childDeviceFactory.call('list') ?: []) as List
-        final List delegatedChildren = (this.@api?.getAllChildDevices() ?: []) as List
-        return mergeUniqueChildren(createdChildren, delegatedChildren)
-    }
-
-    private static List mergeUniqueChildren(List first, List second) {
-        final List merged = []
-        for (Object child in (first ?: [])) {
-            if (!merged.contains(child)) {
-                merged.add(child)
+        if (childDeviceFactory == null) {
+            throw new IllegalStateException("Child device factory is not configured")
+        }
+        List createdChildren = childDeviceFactory.call('list') as List
+        List existingChildren = null
+        try {
+            existingChildren = this.@api?.getAllChildDevices() as List
+        } catch (Throwable ignored) {
+            existingChildren = null
+        }
+        if (existingChildren == null) {
+            try {
+                existingChildren = this.@api?.getChildDevices() as List
+            } catch (Throwable ignored) {
+                existingChildren = null
             }
         }
-
-        for (Object child in (second ?: [])) {
-            if (!merged.contains(child)) {
-                merged.add(child)
-            }
-        }
-
-        return merged
+        return mergeChildDeviceLists(existingChildren, createdChildren)
     }
 
     InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {
@@ -227,6 +247,17 @@ abstract class HubitatAppScript extends
     void deleteChildApp(Long id) {
         assert childAppAccessor != null: "Child app accessor is not configured"
         childAppAccessor('delete', id)
+    }
+
+    private static List mergeChildDeviceLists(List existingChildren, List createdChildren) {
+        LinkedHashSet result = new LinkedHashSet()
+        if (existingChildren != null) {
+            result.addAll(existingChildren)
+        }
+        if (createdChildren != null) {
+            result.addAll(createdChildren)
+        }
+        return new ArrayList(result)
     }
 
     InstalledAppWrapper getParent() {

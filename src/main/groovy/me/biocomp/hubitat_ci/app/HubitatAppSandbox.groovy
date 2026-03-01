@@ -149,22 +149,17 @@ class HubitatAppSandbox {
                 childValidationFlags.addAll(options.validationFlags as List<Flags>)
             }
 
-            def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
-            // Ensure we only pass a DeviceExecutor to child device runs. If caller provided
-            // a specific childDeviceApi use it; otherwise, only use options.api when it
-            // is actually a DeviceExecutor implementation. Passing an AppExecutor here
-            // causes DeviceMetadataReader to be constructed with the wrong delegate and
-            // later MissingMethodException when device-specific getters (like getZwave)
-            // are invoked.
-            def resolvedApi = null
-            if (options.childDeviceApi) {
-                resolvedApi = options.childDeviceApi
-            } else if (options.api instanceof me.biocomp.hubitat_ci.api.device_api.DeviceExecutor) {
-                resolvedApi = options.api
+            DeviceExecutor childDeviceApi = null
+            if (options.childDeviceApi instanceof DeviceExecutor) {
+                childDeviceApi = options.childDeviceApi as DeviceExecutor
+            } else if (options.api instanceof DeviceExecutor) {
+                // Support uncommon cases where a shared executor implements both interfaces.
+                childDeviceApi = options.api as DeviceExecutor
             }
 
+            def deviceSandbox = new HubitatDeviceSandbox(deviceFile)
             def childRunOptions = [
-                    api: resolvedApi,
+                    api: childDeviceApi,
                     validationFlags: childValidationFlags,
                     globals: opts?.globals ?: (options.globals ?: [:]),
                     userSettingValues: opts?.settings ?: [:],
@@ -178,7 +173,8 @@ class HubitatAppSandbox {
             def childScript = deviceSandbox.run(childRunOptions)
 
             // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
-            def wrapper = new ChildDeviceWrapperImpl(childScript?.device as DeviceWrapper, dni, parentWrapper?.id, null)
+            def childDeviceWrapper = childScript.device as DeviceWrapper
+            def wrapper = new ChildDeviceWrapperImpl(childDeviceWrapper, dni, parentWrapper?.id, null, childScript)
             childDeviceRegistry.add(dni, wrapper, childScript)
             return wrapper
         }
@@ -302,7 +298,7 @@ class HubitatAppSandbox {
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
-        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v instanceof DeviceExecutor) })
         objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
          boolParameter("withLifecycle", notRequired())

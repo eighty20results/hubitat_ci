@@ -81,6 +81,9 @@ class ValidatorBase {
                                                             Closure,
                                                             Collection,
                                                             Collections,
+                                                            Range,
+                                                            IntRange,
+                                                            ObjectRange,
                                                             Date,
                                                             TimeKeeper,
                                                             DecimalFormat,
@@ -259,6 +262,9 @@ class ValidatorBase {
 
         def checkerCapture = { expr ->
             if (expr instanceof MethodCallExpression) {
+                if (expr.getObjectExpression() instanceof RangeExpression) {
+                    return !privateForbiddenExpressions.contains(expr.methodAsString)
+                }
                 return !privateForbiddenExpressions.contains(expr.methodAsString) && isClassAllowed(privateClassNameWhiteList,
                         expr.getObjectExpression().getType())
             }
@@ -308,7 +314,7 @@ class ValidatorBase {
         options.addCompilationCustomizers(sac)
     }
 
-    private static boolean isClassAllowed(HashSet<String> classNameWhiteList, ClassNode classNode) {
+    protected static boolean isClassAllowed(HashSet<String> classNameWhiteList, ClassNode classNode) {
         if (classNameWhiteList.contains(classNode.name)) {
             return true
         }

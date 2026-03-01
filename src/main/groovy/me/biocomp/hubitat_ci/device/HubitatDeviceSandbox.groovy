@@ -98,7 +98,7 @@ class HubitatDeviceSandbox {
 
             def dni = deviceNetworkId as String
             def parentId = (options.parent && options.parent.respondsTo('getId')) ? options.parent.id as Long : null
-            def wrapper = new ChildDeviceWrapperImpl(childScript.device as DeviceWrapper, dni, null, parentId)
+            def wrapper = new ChildDeviceWrapperImpl(childScript.device as DeviceWrapper, dni, null, parentId, childScript)
             registry.add(dni, wrapper, childScript)
             return wrapper
         }
@@ -155,7 +155,6 @@ class HubitatDeviceSandbox {
         } catch (Throwable ignored) {
             // Best-effort fallback; ignore if executor implementation forbids metaClass changes.
         }
-
         if (options.withLifecycle && script.metaClass.respondsTo(script, 'installed')) {
             script.installed()
         }

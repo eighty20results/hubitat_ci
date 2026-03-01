@@ -26,38 +26,59 @@ import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
 
 @AutoImplement
 class ChildDeviceWrapperImpl implements ChildDeviceWrapper {
-    ChildDeviceWrapperImpl(DeviceWrapper delegate, String deviceNetworkId, Long parentAppId, Long parentDeviceId) {
+    ChildDeviceWrapperImpl(DeviceWrapper delegate, String deviceNetworkId, Long parentAppId, Long parentDeviceId, Object scriptDelegate = null) {
         this.delegate = delegate
         this.deviceNetworkId = deviceNetworkId
         this.parentAppId = parentAppId
         this.parentDeviceId = parentDeviceId
+        this.scriptDelegate = scriptDelegate
     }
 
     @Delegate
     private final DeviceWrapper delegate
 
+    // Forward dynamic command methods (for example, "on"/"off") to the wrapped device.
+    def methodMissing(String name, Object args) {
+        try {
+            return delegate.invokeMethod(name, args)
+        } catch (MissingMethodException ignored) {
+            if (scriptDelegate != null) {
+                return scriptDelegate.invokeMethod(name, args)
+            }
+            throw ignored
+        }
+    }
+
+    def propertyMissing(String name) {
+        try {
+            return delegate.getProperty(name)
+        } catch (MissingPropertyException ignored) {
+            if (scriptDelegate != null) {
+                return scriptDelegate.getProperty(name)
+            }
+            throw ignored
+        }
+    }
+
+    void propertyMissing(String name, Object value) {
+        try {
+            delegate.setProperty(name, value)
+        } catch (MissingPropertyException ignored) {
+            if (scriptDelegate != null) {
+                scriptDelegate.setProperty(name, value)
+                return
+            }
+            throw ignored
+        }
+    }
+
     String getDeviceNetworkId() { deviceNetworkId }
     Long getParentAppId() { parentAppId }
     Long getParentDeviceId() { parentDeviceId }
+    Object getScript() { scriptDelegate }
 
     private final String deviceNetworkId
     private final Long parentAppId
     private final Long parentDeviceId
-
-    // Forward dynamic command/method calls (e.g. on(), off()) to the underlying delegate
-    @SuppressWarnings(['unused'])
-    public def methodMissing(String name, args) {
-        // delegate may implement dynamic method handling; forward via invokeMethod
-        return delegate?.invokeMethod(name, args)
-    }
-
-    @SuppressWarnings(['unused'])
-    public def invokeMethod(String name, args) {
-        // Prefer calling the actual method if present, otherwise forward to delegate
-        def mm = this.metaClass.getMetaMethod(name, args)
-        if (mm) {
-            return mm.invoke(this, args)
-        }
-        return delegate?.invokeMethod(name, args)
-    }
+    private final Object scriptDelegate
 }
