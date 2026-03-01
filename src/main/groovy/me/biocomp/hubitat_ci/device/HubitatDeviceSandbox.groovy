@@ -85,6 +85,19 @@ class HubitatDeviceSandbox {
                     parent: options.parent
             ] as Map
 
+            // Merge parent sandbox validation flags into the child so that flags
+            // like Flags.DontRunScript are honored consistently across parent/child.
+            def parentValidationFlags = options.validationFlags
+            if (parentValidationFlags) {
+                def mergedFlags = []
+                mergedFlags.addAll(childRunOptions.validationFlags as Collection)
+                if (parentValidationFlags instanceof Collection) {
+                    mergedFlags.addAll(parentValidationFlags as Collection)
+                } else {
+                    mergedFlags.add(parentValidationFlags)
+                }
+                childRunOptions.validationFlags = mergedFlags.unique()
+            }
             // Only set withLifecycle if the caller explicitly provided it. Passing
             // a null value will cause the NamedParametersValidator.boolParameter to
             // assert (it expects a non-null boolean when the key is present).
