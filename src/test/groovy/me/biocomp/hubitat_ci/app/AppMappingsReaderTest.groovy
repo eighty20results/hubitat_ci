@@ -3,8 +3,8 @@ package me.biocomp.hubitat_ci.app
 import me.biocomp.hubitat_ci.api.app_api.AppExecutor
 import me.biocomp.hubitat_ci.api.common_api.Log
 import me.biocomp.hubitat_ci.validation.Flags
-import groovy.transform.NotYetImplemented
 import spock.lang.Specification
+import spock.lang.Ignore
 
 class AppMappingsReaderTest extends
         Specification
@@ -136,7 +136,8 @@ mappings{
             e.message.contains("GET")
     }
 
-    @NotYetImplemented
+    // TODO: implement
+    @Ignore
     def "mappings() method can itself reference 'params' and 'request'"() {
         def script = """
 def renderConfig() {

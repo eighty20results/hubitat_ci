@@ -1,0 +1,307 @@
+Downloading https://services.gradle.org/distributions/gradle-8.5-bin.zip
+............10%.............20%............30%.............40%.............50%............60%.............70%.............80%............90%.............100%
+Initialized native services in: /home/runner/.gradle/native
+Initialized jansi services in: /home/runner/.gradle/native
+
+Welcome to Gradle 8.5!
+
+Here are the highlights of this release:
+ - Support for running on Java 21
+ - Faster first use with Kotlin DSL
+ - Improved error and warning messages
+
+For more details see https://docs.gradle.org/8.5/release-notes.html
+
+Received JVM installation metadata from '/usr/lib/jvm/temurin-17-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64, JAVA_VERSION=17.0.18, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.18+8, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.18+8, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+Removing 0 daemon stop events from registry
+Starting a Gradle Daemon (subsequent builds will be faster)
+Starting process 'Gradle build daemon'. Working directory: /home/runner/.gradle/daemon/8.5 Command: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED -XX:MaxMetaspaceSize=384m -XX:+HeapDumpOnOutOfMemoryError -Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant -cp /home/runner/.gradle/wrapper/dists/gradle-8.5-bin/5t9huq95ubn472n8rpzujfbqh/gradle-8.5/lib/gradle-launcher-8.5.jar -javaagent:/home/runner/.gradle/wrapper/dists/gradle-8.5-bin/5t9huq95ubn472n8rpzujfbqh/gradle-8.5/lib/agents/gradle-instrumentation-agent-8.5.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 8.5
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 1.401 secs.
+The client will now receive all logging from the daemon (pid: 3984). The daemon log file: /home/runner/.gradle/daemon/8.5/daemon-3984.out.log
+Starting build in new daemon [memory: 512 MiB]
+Using 4 worker leases.
+Received JVM installation metadata from '/usr/lib/jvm/temurin-17-jdk-amd64': {JAVA_HOME=/usr/lib/jvm/temurin-17-jdk-amd64, JAVA_VERSION=17.0.18, JAVA_VENDOR=Eclipse Adoptium, RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=17.0.18+8, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=17.0.18+8, VM_VENDOR=Eclipse Adoptium, OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [/home/runner/work/hubitat_ci/hubitat_ci] as hierarchies to watch
+File system watching is active
+Starting Build
+Settings evaluated using settings file '/home/runner/work/hubitat_ci/hubitat_ci/settings.gradle'.
+Projects loaded. Root project using build file '/home/runner/work/hubitat_ci/hubitat_ci/build.gradle'.
+Included projects: [root project 'hubitat_ci']
+
+> Configure project :
+Evaluating root project 'hubitat_ci' using build file '/home/runner/work/hubitat_ci/hubitat_ci/build.gradle'.
+Compiling build file '/home/runner/work/hubitat_ci/hubitat_ci/build.gradle' using SubsetScriptTransformer.
+Compiling build file '/home/runner/work/hubitat_ci/hubitat_ci/build.gradle' using BuildScriptTransformer.
+All projects evaluated.
+Task name matched 'test'
+Selected primary task 'test' from project :
+Tasks to be executed: [task ':compileJava', task ':compileGroovy', task ':processResources', task ':classes', task ':compileTestJava', task ':compileTestGroovy', task ':processTestResources', task ':testClasses', task ':test']
+Tasks that were excluded: []
+Resolve mutations for :compileJava (Thread[Execution worker,5,main]) started.
+:compileJava (Thread[Execution worker,5,main]) started.
+
+> Task :compileJava NO-SOURCE
+Skipping task ':compileJava' as it has no source files and no previous output files.
+Resolve mutations for :compileGroovy (Thread[Execution worker,5,main]) started.
+:compileGroovy (Thread[Execution worker,5,main]) started.
+
+> Task :compileGroovy
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-all/2.5.4/groovy-all-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download1174462409403318209bin
+Downloading https://repo.maven.apache.org/maven2/org/ow2/asm/asm/7.0/asm-7.0.pom to /home/runner/.gradle/.tmp/gradle_download17110221563014119659bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-dateutil/2.5.4/groovy-dateutil-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download2326581153588508223bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-io/1.3.2/commons-io-1.3.2.pom to /home/runner/.gradle/.tmp/gradle_download7488155151954029695bin
+org.apache.commons:commons-io:1.3.2 is relocated to commons-io:commons-io:1.3.2. Please update your dependencies.
+Downloading https://repo.maven.apache.org/maven2/org/ow2/ow2/1.5/ow2-1.5.pom to /home/runner/.gradle/.tmp/gradle_download5684136404030354526bin
+Downloading https://repo.maven.apache.org/maven2/org/quartz-scheduler/quartz/2.3.0/quartz-2.3.0.pom to /home/runner/.gradle/.tmp/gradle_download9433055675717440040bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/modules/http-builder/http-builder/0.5.0/http-builder-0.5.0.pom to /home/runner/.gradle/.tmp/gradle_download12622066390709138534bin
+Downloading https://repo.maven.apache.org/maven2/su/litvak/chromecast/api-v2/0.11.1/api-v2-0.11.1.pom to /home/runner/.gradle/.tmp/gradle_download15145657890376205363bin
+Downloading https://repo.maven.apache.org/maven2/org/spockframework/spock-core/1.2-groovy-2.5/spock-core-1.2-groovy-2.5.pom to /home/runner/.gradle/.tmp/gradle_download17668880250216507888bin
+Downloading https://repo.maven.apache.org/maven2/org/quartz-scheduler/quartz-parent/2.3.0/quartz-parent-2.3.0.pom to /home/runner/.gradle/.tmp/gradle_download6074268299560657022bin
+Downloading https://repo.maven.apache.org/maven2/commons-io/commons-io/1.3.2/commons-io-1.3.2.pom to /home/runner/.gradle/.tmp/gradle_download18437366390775808279bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/3/commons-parent-3.pom to /home/runner/.gradle/.tmp/gradle_download7762205151050072503bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/apache/4/apache-4.pom to /home/runner/.gradle/.tmp/gradle_download16116176647577514359bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-ant/2.5.4/groovy-ant-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download10790406730154214079bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-cli-picocli/2.5.4/groovy-cli-picocli-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download12905244500147461630bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy/2.5.4/groovy-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download9988599677676956302bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-cli-commons/2.5.4/groovy-cli-commons-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download18293393355544841779bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-datetime/2.5.4/groovy-datetime-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download5426576247709537349bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-console/2.5.4/groovy-console-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download9247478674957885121bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-groovydoc/2.5.4/groovy-groovydoc-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download18039138455585750613bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-docgenerator/2.5.4/groovy-docgenerator-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download7671188175581820425bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-groovysh/2.5.4/groovy-groovysh-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download2623844616556777068bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-jmx/2.5.4/groovy-jmx-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download3516927083904710575bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-json/2.5.4/groovy-json-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download10194385593906487609bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-jsr223/2.5.4/groovy-jsr223-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download14002382215003754632bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-macro/2.5.4/groovy-macro-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download373426366893665319bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-nio/2.5.4/groovy-nio-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download7634981031300612664bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-servlet/2.5.4/groovy-servlet-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download2400249575083541058bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-sql/2.5.4/groovy-sql-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download8418894438110947518bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-swing/2.5.4/groovy-swing-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download3830982578247020185bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-templates/2.5.4/groovy-templates-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download16407980864302844355bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-test/2.5.4/groovy-test-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download2547035973072388824bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-testng/2.5.4/groovy-testng-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download14764417621392066455bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-test-junit5/2.5.4/groovy-test-junit5-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download7741746370567610437bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-xml/2.5.4/groovy-xml-2.5.4.pom to /home/runner/.gradle/.tmp/gradle_download7828438071698518117bin
+Downloading https://repo.maven.apache.org/maven2/com/mchange/mchange-commons-java/0.2.11/mchange-commons-java-0.2.11.pom to /home/runner/.gradle/.tmp/gradle_download12237674392074788891bin
+Downloading https://repo.maven.apache.org/maven2/com/zaxxer/HikariCP-java6/2.3.13/HikariCP-java6-2.3.13.pom to /home/runner/.gradle/.tmp/gradle_download9485499021966034005bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.pom to /home/runner/.gradle/.tmp/gradle_download16751627111424974087bin
+Downloading https://repo.maven.apache.org/maven2/com/mchange/c3p0/0.9.5.2/c3p0-0.9.5.2.pom to /home/runner/.gradle/.tmp/gradle_download2726619813013990402bin
+Downloading https://repo.maven.apache.org/maven2/com/zaxxer/HikariCP-parent/2.3.13/HikariCP-parent-2.3.13.pom to /home/runner/.gradle/.tmp/gradle_download7480381969726457206bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-parent/1.7.7/slf4j-parent-1.7.7.pom to /home/runner/.gradle/.tmp/gradle_download5735578291648327257bin
+Downloading https://repo.maven.apache.org/maven2/org/sonatype/oss/oss-parent/7/oss-parent-7.pom to /home/runner/.gradle/.tmp/gradle_download12918481130565041540bin
+Downloading https://repo.maven.apache.org/maven2/org/jmdns/jmdns/maven-metadata.xml to /home/runner/.gradle/.tmp/gradle_download11033422570477844403bin
+Downloading https://repo.maven.apache.org/maven2/org/jmdns/jmdns/3.5.5/jmdns-3.5.5.pom to /home/runner/.gradle/.tmp/gradle_download13142905331221570704bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/maven-metadata.xml to /home/runner/.gradle/.tmp/gradle_download8622193389560779144bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.9.10/jackson-annotations-2.9.10.pom to /home/runner/.gradle/.tmp/gradle_download11278274247280420042bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-parent/2.9.1.2/jackson-parent-2.9.1.2.pom to /home/runner/.gradle/.tmp/gradle_download6740767128158279861bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/oss-parent/34/oss-parent-34.pom to /home/runner/.gradle/.tmp/gradle_download2305845255042369484bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/maven-metadata.xml to /home/runner/.gradle/.tmp/gradle_download7438991839850328817bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.10.8/jackson-databind-2.9.10.8.pom to /home/runner/.gradle/.tmp/gradle_download17097502258620480456bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-base/2.9.10.20210106/jackson-base-2.9.10.20210106.pom to /home/runner/.gradle/.tmp/gradle_download1111073860168691594bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-bom/2.9.10.20210106/jackson-bom-2.9.10.20210106.pom to /home/runner/.gradle/.tmp/gradle_download9404323109484922985bin
+Downloading https://repo.maven.apache.org/maven2/com/google/protobuf/protobuf-java/2.6.0/protobuf-java-2.6.0.pom to /home/runner/.gradle/.tmp/gradle_download5726372065321595449bin
+Downloading https://repo.maven.apache.org/maven2/com/google/google/1/google-1.pom to /home/runner/.gradle/.tmp/gradle_download3264284976605134745bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy/maven-metadata.xml to /home/runner/.gradle/.tmp/gradle_download1900959084405275785bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy/1.7-rc-2/groovy-1.7-rc-2.pom to /home/runner/.gradle/.tmp/gradle_download143029582272998374bin
+Downloading https://repo.maven.apache.org/maven2/net/sourceforge/nekohtml/nekohtml/1.9.9/nekohtml-1.9.9.pom to /home/runner/.gradle/.tmp/gradle_download666913274470065802bin
+Downloading https://repo.maven.apache.org/maven2/net/sf/json-lib/json-lib/2.3/json-lib-2.3.pom to /home/runner/.gradle/.tmp/gradle_download14717418257993074532bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient/4.0/httpclient-4.0.pom to /home/runner/.gradle/.tmp/gradle_download1307953414148139586bin
+Downloading https://repo.maven.apache.org/maven2/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.pom to /home/runner/.gradle/.tmp/gradle_download16729036139513754461bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcomponents-client/4.0/httpcomponents-client-4.0.pom to /home/runner/.gradle/.tmp/gradle_download4127849202732547354bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/apache/3/apache-3.pom to /home/runner/.gradle/.tmp/gradle_download3631217920602931438bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/project/4.0/project-4.0.pom to /home/runner/.gradle/.tmp/gradle_download6233904060524653685bin
+Downloading https://repo.maven.apache.org/maven2/junit/junit/4.12/junit-4.12.pom to /home/runner/.gradle/.tmp/gradle_download5552518798214064143bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant/1.9.13/ant-1.9.13.pom to /home/runner/.gradle/.tmp/gradle_download5282754200579882521bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-parent/1.9.13/ant-parent-1.9.13.pom to /home/runner/.gradle/.tmp/gradle_download15529136063887834408bin
+Downloading https://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.4/commons-cli-1.4.pom to /home/runner/.gradle/.tmp/gradle_download1068849856967563309bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/42/commons-parent-42.pom to /home/runner/.gradle/.tmp/gradle_download12876618872578850420bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/apache/18/apache-18.pom to /home/runner/.gradle/.tmp/gradle_download10292396316740540501bin
+Downloading https://repo.maven.apache.org/maven2/info/picocli/picocli/3.7.0/picocli-3.7.0.pom to /home/runner/.gradle/.tmp/gradle_download5790196992390990547bin
+Downloading https://repo.maven.apache.org/maven2/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1.pom to /home/runner/.gradle/.tmp/gradle_download8761613278783892817bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/codehaus-parent/4/codehaus-parent-4.pom to /home/runner/.gradle/.tmp/gradle_download17764834473581208615bin
+Downloading https://repo.maven.apache.org/maven2/jline/jline/2.14.6/jline-2.14.6.pom to /home/runner/.gradle/.tmp/gradle_download17890360197833378967bin
+Downloading https://repo.maven.apache.org/maven2/org/sonatype/oss/oss-parent/9/oss-parent-9.pom to /home/runner/.gradle/.tmp/gradle_download13726668730345985452bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-launcher/1.3.1/junit-platform-launcher-1.3.1.pom to /home/runner/.gradle/.tmp/gradle_download13055018554431200654bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.10/slf4j-api-1.7.10.pom to /home/runner/.gradle/.tmp/gradle_download3871297778393864150bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-parent/1.7.10/slf4j-parent-1.7.10.pom to /home/runner/.gradle/.tmp/gradle_download8307268831292067529bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.pom to /home/runner/.gradle/.tmp/gradle_download10601233807343811386bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-parent/1.7.25/slf4j-parent-1.7.25.pom to /home/runner/.gradle/.tmp/gradle_download4331494751729029670bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.9.10/jackson-core-2.9.10.pom to /home/runner/.gradle/.tmp/gradle_download2384885964440087400bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-base/2.9.10/jackson-base-2.9.10.pom to /home/runner/.gradle/.tmp/gradle_download18160624272016666355bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/jackson-bom/2.9.10/jackson-bom-2.9.10.pom to /home/runner/.gradle/.tmp/gradle_download2618717994531573404bin
+Downloading https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.3/commons-codec-1.3.pom to /home/runner/.gradle/.tmp/gradle_download6541977057796845991bin
+Downloading https://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.pom to /home/runner/.gradle/.tmp/gradle_download4359506587744732662bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.pom to /home/runner/.gradle/.tmp/gradle_download5513596435925174898bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/5/commons-parent-5.pom to /home/runner/.gradle/.tmp/gradle_download1678153317639999863bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcomponents-core/4.0.1/httpcomponents-core-4.0.1.pom to /home/runner/.gradle/.tmp/gradle_download159452524976266874bin
+Downloading https://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.pom to /home/runner/.gradle/.tmp/gradle_download14359363607748526163bin
+Downloading https://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.pom to /home/runner/.gradle/.tmp/gradle_download6507133713821908271bin
+Downloading https://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.pom to /home/runner/.gradle/.tmp/gradle_download17458346017564580810bin
+Downloading https://repo.maven.apache.org/maven2/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.pom to /home/runner/.gradle/.tmp/gradle_download1706069110966598028bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/9/commons-parent-9.pom to /home/runner/.gradle/.tmp/gradle_download95620542128668820bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/commons/commons-parent/11/commons-parent-11.pom to /home/runner/.gradle/.tmp/gradle_download187111140843006019bin
+Downloading https://repo.maven.apache.org/maven2/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.pom to /home/runner/.gradle/.tmp/gradle_download10432121910742578115bin
+Downloading https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.pom to /home/runner/.gradle/.tmp/gradle_download13754783996059809364bin
+Downloading https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-parent/1.3/hamcrest-parent-1.3.pom to /home/runner/.gradle/.tmp/gradle_download11096138493126359520bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.9.13/ant-launcher-1.9.13.pom to /home/runner/.gradle/.tmp/gradle_download12072979944710619892bin
+Downloading https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.0.0/apiguardian-api-1.0.0.pom to /home/runner/.gradle/.tmp/gradle_download2644589567798985496bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-engine/1.3.1/junit-platform-engine-1.3.1.pom to /home/runner/.gradle/.tmp/gradle_download15406605082957331608bin
+Downloading https://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.3.03/xml-apis-1.3.03.pom to /home/runner/.gradle/.tmp/gradle_download17771174119249393142bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/apache/1/apache-1.pom to /home/runner/.gradle/.tmp/gradle_download10280610028796552645bin
+Downloading https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.1.1/opentest4j-1.1.1.pom to /home/runner/.gradle/.tmp/gradle_download14387788059146438955bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-commons/1.3.1/junit-platform-commons-1.3.1.pom to /home/runner/.gradle/.tmp/gradle_download11440668132600622921bin
+Resource missing. [HTTP HEAD: https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-all/2.5.4/groovy-all-2.5.4.jar]
+Downloading https://repo.maven.apache.org/maven2/su/litvak/chromecast/api-v2/0.11.1/api-v2-0.11.1.jar to /home/runner/.gradle/.tmp/gradle_download9310742232789733925bin
+Downloading https://repo.maven.apache.org/maven2/org/ow2/asm/asm/7.0/asm-7.0.jar to /home/runner/.gradle/.tmp/gradle_download11502165904230593105bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-dateutil/2.5.4/groovy-dateutil-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download2364883231025556782bin
+Downloading https://repo.maven.apache.org/maven2/org/quartz-scheduler/quartz/2.3.0/quartz-2.3.0.jar to /home/runner/.gradle/.tmp/gradle_download1651351519578136394bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/modules/http-builder/http-builder/0.5.0/http-builder-0.5.0.jar to /home/runner/.gradle/.tmp/gradle_download1506553665280120203bin
+Downloading https://repo.maven.apache.org/maven2/org/spockframework/spock-core/1.2-groovy-2.5/spock-core-1.2-groovy-2.5.jar to /home/runner/.gradle/.tmp/gradle_download15661170315275092760bin
+Downloading https://repo.maven.apache.org/maven2/commons-io/commons-io/1.3.2/commons-io-1.3.2.jar to /home/runner/.gradle/.tmp/gradle_download11429934937410957574bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-ant/2.5.4/groovy-ant-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download3448389313077569440bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-cli-commons/2.5.4/groovy-cli-commons-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download1449217378030953729bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-groovysh/2.5.4/groovy-groovysh-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download12842387901631523723bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-console/2.5.4/groovy-console-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download17097695684396957583bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-docgenerator/2.5.4/groovy-docgenerator-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download14240146353744871201bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-groovydoc/2.5.4/groovy-groovydoc-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download5652658996666884972bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-cli-picocli/2.5.4/groovy-cli-picocli-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download1701727557613965832bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-json/2.5.4/groovy-json-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download14295505611418028493bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-jmx/2.5.4/groovy-jmx-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download8549799837633926086bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-datetime/2.5.4/groovy-datetime-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download18096317789634729433bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-jsr223/2.5.4/groovy-jsr223-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download9907248985546355979bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-nio/2.5.4/groovy-nio-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download6709665129961496666bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-servlet/2.5.4/groovy-servlet-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download18114681734328711731bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-macro/2.5.4/groovy-macro-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download679307861991865295bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-sql/2.5.4/groovy-sql-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download13723790822026441552bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-swing/2.5.4/groovy-swing-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download6750322637597269936bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-templates/2.5.4/groovy-templates-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download10441155357211443773bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-test/2.5.4/groovy-test-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download10356106081156202272bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-test-junit5/2.5.4/groovy-test-junit5-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download16721851428058424044bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-testng/2.5.4/groovy-testng-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download4574460666862299664bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy-xml/2.5.4/groovy-xml-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download10976106948338151571bin
+Downloading https://repo.maven.apache.org/maven2/com/mchange/c3p0/0.9.5.2/c3p0-0.9.5.2.jar to /home/runner/.gradle/.tmp/gradle_download130753723713827246bin
+Downloading https://repo.maven.apache.org/maven2/org/codehaus/groovy/groovy/2.5.4/groovy-2.5.4.jar to /home/runner/.gradle/.tmp/gradle_download6983170301691415777bin
+Downloading https://repo.maven.apache.org/maven2/com/mchange/mchange-commons-java/0.2.11/mchange-commons-java-0.2.11.jar to /home/runner/.gradle/.tmp/gradle_download6789032862014107736bin
+Downloading https://repo.maven.apache.org/maven2/com/zaxxer/HikariCP-java6/2.3.13/HikariCP-java6-2.3.13.jar to /home/runner/.gradle/.tmp/gradle_download9429676459582583982bin
+Downloading https://repo.maven.apache.org/maven2/org/jmdns/jmdns/3.5.5/jmdns-3.5.5.jar to /home/runner/.gradle/.tmp/gradle_download15589235717964446728bin
+Downloading https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar to /home/runner/.gradle/.tmp/gradle_download18143252637892057407bin
+Downloading https://repo.maven.apache.org/maven2/com/google/protobuf/protobuf-java/2.6.0/protobuf-java-2.6.0.jar to /home/runner/.gradle/.tmp/gradle_download7970768242513368445bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.9.10.8/jackson-databind-2.9.10.8.jar to /home/runner/.gradle/.tmp/gradle_download8421086199207078877bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient/4.0/httpclient-4.0.jar to /home/runner/.gradle/.tmp/gradle_download3574105032278438374bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.9.10/jackson-annotations-2.9.10.jar to /home/runner/.gradle/.tmp/gradle_download15476068241410932301bin
+Downloading https://repo.maven.apache.org/maven2/net/sf/json-lib/json-lib/2.3/json-lib-2.3-jdk15.jar to /home/runner/.gradle/.tmp/gradle_download4684853506284651977bin
+Downloading https://repo.maven.apache.org/maven2/net/sourceforge/nekohtml/nekohtml/1.9.9/nekohtml-1.9.9.jar to /home/runner/.gradle/.tmp/gradle_download7888629895805608434bin
+Downloading https://repo.maven.apache.org/maven2/xml-resolver/xml-resolver/1.2/xml-resolver-1.2.jar to /home/runner/.gradle/.tmp/gradle_download71903179865154663bin
+Downloading https://repo.maven.apache.org/maven2/junit/junit/4.12/junit-4.12.jar to /home/runner/.gradle/.tmp/gradle_download6440531136240936962bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant/1.9.13/ant-1.9.13.jar to /home/runner/.gradle/.tmp/gradle_download17855304387939057312bin
+Downloading https://repo.maven.apache.org/maven2/commons-cli/commons-cli/1.4/commons-cli-1.4.jar to /home/runner/.gradle/.tmp/gradle_download3311534168314831063bin
+Downloading https://repo.maven.apache.org/maven2/info/picocli/picocli/3.7.0/picocli-3.7.0.jar to /home/runner/.gradle/.tmp/gradle_download3229377600291351996bin
+Downloading https://repo.maven.apache.org/maven2/com/thoughtworks/qdox/qdox/1.12.1/qdox-1.12.1.jar to /home/runner/.gradle/.tmp/gradle_download207589728380434888bin
+Downloading https://repo.maven.apache.org/maven2/jline/jline/2.14.6/jline-2.14.6.jar to /home/runner/.gradle/.tmp/gradle_download7083936818231044092bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-launcher/1.3.1/junit-platform-launcher-1.3.1.jar to /home/runner/.gradle/.tmp/gradle_download13876477063245567979bin
+Downloading https://repo.maven.apache.org/maven2/com/fasterxml/jackson/core/jackson-core/2.9.10/jackson-core-2.9.10.jar to /home/runner/.gradle/.tmp/gradle_download2420504485159440170bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcore/4.0.1/httpcore-4.0.1.jar to /home/runner/.gradle/.tmp/gradle_download15254278583346616198bin
+Downloading https://repo.maven.apache.org/maven2/commons-beanutils/commons-beanutils/1.8.0/commons-beanutils-1.8.0.jar to /home/runner/.gradle/.tmp/gradle_download15902136953442866934bin
+Downloading https://repo.maven.apache.org/maven2/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar to /home/runner/.gradle/.tmp/gradle_download14306098669944116234bin
+Downloading https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.3/commons-codec-1.3.jar to /home/runner/.gradle/.tmp/gradle_download17744980971625444119bin
+Downloading https://repo.maven.apache.org/maven2/commons-collections/commons-collections/3.2.1/commons-collections-3.2.1.jar to /home/runner/.gradle/.tmp/gradle_download12263455293331342913bin
+Downloading https://repo.maven.apache.org/maven2/net/sf/ezmorph/ezmorph/1.0.6/ezmorph-1.0.6.jar to /home/runner/.gradle/.tmp/gradle_download5563472167952348091bin
+Downloading https://repo.maven.apache.org/maven2/commons-lang/commons-lang/2.4/commons-lang-2.4.jar to /home/runner/.gradle/.tmp/gradle_download8522790749342331183bin
+Downloading https://repo.maven.apache.org/maven2/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar to /home/runner/.gradle/.tmp/gradle_download12159813265959900430bin
+Downloading https://repo.maven.apache.org/maven2/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar to /home/runner/.gradle/.tmp/gradle_download8425508366009907694bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-launcher/1.9.13/ant-launcher-1.9.13.jar to /home/runner/.gradle/.tmp/gradle_download4670014484583630432bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-engine/1.3.1/junit-platform-engine-1.3.1.jar to /home/runner/.gradle/.tmp/gradle_download15189950911111688320bin
+Downloading https://repo.maven.apache.org/maven2/org/junit/platform/junit-platform-commons/1.3.1/junit-platform-commons-1.3.1.jar to /home/runner/.gradle/.tmp/gradle_download8997940873647180059bin
+Downloading https://repo.maven.apache.org/maven2/org/apiguardian/apiguardian-api/1.0.0/apiguardian-api-1.0.0.jar to /home/runner/.gradle/.tmp/gradle_download15387525074373367237bin
+Downloading https://repo.maven.apache.org/maven2/org/opentest4j/opentest4j/1.1.1/opentest4j-1.1.1.jar to /home/runner/.gradle/.tmp/gradle_download9197073098920435602bin
+Downloading https://repo.maven.apache.org/maven2/xml-apis/xml-apis/1.3.03/xml-apis-1.3.03.jar to /home/runner/.gradle/.tmp/gradle_download1946143170316822222bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-antlr/1.9.13/ant-antlr-1.9.13.pom to /home/runner/.gradle/.tmp/gradle_download4658744653195051114bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-junit/1.9.13/ant-junit-1.9.13.pom to /home/runner/.gradle/.tmp/gradle_download18216195377875254425bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-antlr/1.9.13/ant-antlr-1.9.13.jar to /home/runner/.gradle/.tmp/gradle_download17482996710621801157bin
+Downloading https://repo.maven.apache.org/maven2/org/apache/ant/ant-junit/1.9.13/ant-junit-1.9.13.jar to /home/runner/.gradle/.tmp/gradle_download2805784817209227941bin
+Caching disabled for task ':compileGroovy' because:
+  Build cache is disabled
+Task ':compileGroovy' is not up-to-date because:
+  No history is available.
+The input changes require a full rebuild for incremental task ':compileGroovy'.
+Starting process 'Gradle Worker Daemon 1'. Working directory: /home/runner/.gradle/workers Command: /usr/lib/jvm/temurin-17-jdk-amd64/bin/java --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED @/home/runner/.gradle/.tmp/gradle-worker-classpath7779441881973637545txt -Xmx512m -Dfile.encoding=UTF-8 -Duser.country -Duser.language=en -Duser.variant worker.org.gradle.process.internal.worker.GradleWorkerMain 'Gradle Worker Daemon 1'
+Successfully started process 'Gradle Worker Daemon 1'
+Started Gradle worker daemon (0.457 secs) with fork options DaemonForkOptions{executable=/usr/lib/jvm/temurin-17-jdk-amd64/bin/java, minHeapSize=null, maxHeapSize=null, jvmArgs=[--add-opens=java.base/java.lang=ALL-UNNAMED, --add-opens=java.base/java.lang.invoke=ALL-UNNAMED, --add-opens=java.base/java.util=ALL-UNNAMED, --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED], keepAliveMode=SESSION}.
+
+This JVM does not support getting OS memory, so no OS memory status updates will be broadcast
+
+> Task :compileGroovy FAILED
+java.lang.NoClassDefFoundError: Could not initialize class org.codehaus.groovy.vmplugin.v7.Java7
+	at org.codehaus.groovy.vmplugin.VMPluginFactory.<clinit>(VMPluginFactory.java:43)
+	at org.codehaus.groovy.reflection.GroovyClassValueFactory.<clinit>(GroovyClassValueFactory.java:35)
+	at org.codehaus.groovy.reflection.ClassInfo.<clinit>(ClassInfo.java:109)
+	at org.codehaus.groovy.reflection.ReflectionCache.getCachedClass(ReflectionCache.java:95)
+	at org.codehaus.groovy.reflection.ReflectionCache.<clinit>(ReflectionCache.java:39)
+	at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.registerMethods(MetaClassRegistryImpl.java:209)
+	at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:107)
+	at org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl.<init>(MetaClassRegistryImpl.java:85)
+	at groovy.lang.GroovySystem.<clinit>(GroovySystem.java:36)
+	at org.gradle.api.internal.tasks.compile.ApiGroovyCompiler.parseGroovyVersion(ApiGroovyCompiler.java:357)
+	at org.gradle.api.internal.tasks.compile.ApiGroovyCompiler.execute(ApiGroovyCompiler.java:159)
+	at org.gradle.api.internal.tasks.compile.ApiGroovyCompiler.execute(ApiGroovyCompiler.java:67)
+	at org.gradle.api.internal.tasks.compile.GroovyCompilerFactory$DaemonSideCompiler.execute(GroovyCompilerFactory.java:90)
+	at org.gradle.api.internal.tasks.compile.GroovyCompilerFactory$DaemonSideCompiler.execute(GroovyCompilerFactory.java:76)
+	at org.gradle.api.internal.tasks.compile.daemon.AbstractIsolatedCompilerWorkerExecutor$CompilerWorkAction.execute(AbstractIsolatedCompilerWorkerExecutor.java:78)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:54)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker$1.create(AbstractClassLoaderWorker.java:48)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.AbstractClassLoaderWorker.executeInClassLoader(AbstractClassLoaderWorker.java:48)
+	at org.gradle.workers.internal.IsolatedClassloaderWorker.run(IsolatedClassloaderWorker.java:49)
+	at org.gradle.workers.internal.IsolatedClassloaderWorker.run(IsolatedClassloaderWorker.java:30)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:96)
+	at org.gradle.workers.internal.WorkerDaemonServer.run(WorkerDaemonServer.java:65)
+	at org.gradle.process.internal.worker.request.WorkerAction$1.call(WorkerAction.java:138)
+	at org.gradle.process.internal.worker.child.WorkerLogEventListener.withWorkerLoggingProtocol(WorkerLogEventListener.java:41)
+	at org.gradle.process.internal.worker.request.WorkerAction.lambda$run$0(WorkerAction.java:135)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:80)
+	at org.gradle.process.internal.worker.request.WorkerAction.run(WorkerAction.java:127)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:36)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:24)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:182)
+	at org.gradle.internal.remote.internal.hub.MessageHubBackedObjectConnection$DispatchWrapper.dispatch(MessageHubBackedObjectConnection.java:164)
+	at org.gradle.internal.remote.internal.hub.MessageHub$Handler.run(MessageHub.java:414)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Caused by: java.lang.ExceptionInInitializerError: Exception org.codehaus.groovy.GroovyBugError [in thread "/127.0.0.1:49736 to /127.0.0.1:40281 workers"]
+	at org.codehaus.groovy.vmplugin.v7.Java7.<clinit>(Java7.java:45)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+	at java.base/java.lang.reflect.ReflectAccess.newInstance(ReflectAccess.java:128)
+	at java.base/jdk.internal.reflect.ReflectionFactory.newInstance(ReflectionFactory.java:347)
+	at java.base/java.lang.Class.newInstance(Class.java:647)
+	at org.codehaus.groovy.vmplugin.VMPluginFactory.createPlugin(VMPluginFactory.java:57)
+	at org.codehaus.groovy.vmplugin.VMPluginFactory.<clinit>(VMPluginFactory.java:39)
+	... 42 more
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileGroovy'.
+> Could not initialize class org.codehaus.groovy.reflection.ReflectionCache
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 19s
+1 actionable task: 1 executed
+Stopped 1 worker daemon(s).
