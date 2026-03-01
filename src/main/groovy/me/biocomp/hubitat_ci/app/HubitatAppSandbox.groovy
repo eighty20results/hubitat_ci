@@ -134,9 +134,9 @@ class HubitatAppSandbox {
 
         Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            assert resolver : "childDeviceResolver is required to build child devices"
+            if (!resolver) throw new IllegalArgumentException("childDeviceResolver is required to build child devices")
             File deviceFile = resolver(namespace, typeName)
-            assert deviceFile?.exists(): "Could not resolve child device file for ${namespace}:${typeName}"
+            if (!deviceFile?.exists()) throw new IllegalArgumentException("Could not resolve child device file for ${namespace}:${typeName}")
 
             // Merge validation flags so child device respects parent flags (including DontRunScript)
             def childValidationFlags = [] as List<Flags>
@@ -186,9 +186,9 @@ class HubitatAppSandbox {
 
         Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
             Closure<File> appResolver = (Closure<File>) options.childAppResolver
-            assert appResolver : "childAppResolver is required to build child apps"
+            if (!appResolver) throw new IllegalArgumentException("childAppResolver is required to build child apps")
             File appFile = appResolver(namespace, smartAppVersionName)
-            assert appFile?.exists(): "Could not resolve child app file for ${namespace}:${smartAppVersionName}"
+            if (!appFile?.exists()) throw new IllegalArgumentException("Could not resolve child app file for ${namespace}:${smartAppVersionName}")
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
