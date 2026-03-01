@@ -126,17 +126,30 @@ class HubitatAppSandbox {
 
                 // As a last resort, try searching Scripts/Devices for files whose name contains tn
                 def scriptsDir = new File('Scripts/Devices')
-                if (scriptsDir.exists()) {
+                if (scriptsDir.exists() && tn) {
                     def files = scriptsDir.listFiles()
                     if (files != null) {
+                        List<File> matchingFiles = []
                         for (f in files) {
                             // Skip directories and other non-regular files
                             if (!f.isFile()) {
                                 continue
                             }
                             if (f.name.contains(tn)) {
-                                return f
+                                matchingFiles << f
                             }
+                        }
+                        if (!matchingFiles.isEmpty()) {
+                            // Sort by name to ensure deterministic order
+                            matchingFiles.sort { it.name }
+                            if (matchingFiles.size() == 1) {
+                                return matchingFiles[0]
+                            }
+                            throw new IllegalStateException(
+                                    "Multiple candidate device driver files found for typeName '${typeName}' " +
+                                            "(normalized to '${tn}') in Scripts/Devices: " +
+                                            matchingFiles.collect { it.name }.join(', ')
+                            )
                         }
                     }
                 }
