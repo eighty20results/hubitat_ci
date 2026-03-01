@@ -128,6 +128,8 @@ class SandboxClassLoader extends ClassLoader {
             // AtomicState is represented in the local API root package rather than under hub.domain
             case 'hubitat.hub.domain.AtomicState':
                 return "${basePackageName}AtomicState"
+            case 'com.hubitat.hub.domain.AtomicState':
+                return "${basePackageName}AtomicState"
 
             case 'com.hubitat.hub.domain.State':
                 return "${basePackageName}State"
