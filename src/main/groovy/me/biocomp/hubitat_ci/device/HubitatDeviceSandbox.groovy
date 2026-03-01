@@ -55,17 +55,7 @@ class HubitatDeviceSandbox {
     private HubitatDeviceScript setupImpl(Map options) {
         validateAndUpdateSandboxOptions(options)
 
-        // Merge validation flags so caller controls definition/prefs/run behavior
-        def effectiveFlags = [] as List<Flags>
-        effectiveFlags.addAll(options.validationFlags ?: [])
-        if (!effectiveFlags.contains(Flags.DontValidateDefinition)) {
-            effectiveFlags << Flags.DontValidateDefinition
-        }
-        if (!effectiveFlags.contains(Flags.DontValidatePreferences)) {
-            effectiveFlags << Flags.DontValidatePreferences
-        }
-
-        def validator = readValidator([validationFlags: effectiveFlags])
+        def validator = readValidator(options)
 
         def registry = new ChildDeviceRegistry()
 

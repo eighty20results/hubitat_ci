@@ -54,10 +54,7 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     ChildDeviceWrapper addChildDevice(String namespace, String typeName, String deviceNetworkId, Long hubId, Map options) {
-        def built = childDeviceBuilder?.call(namespace, typeName, deviceNetworkId, hubId, options)
-        def wrapped = (ChildDeviceWrapper) built
-        childDeviceRegistry.add(deviceNetworkId, wrapped)
-        return wrapped
+        return (ChildDeviceWrapper) childDeviceBuilder?.call(namespace, typeName, deviceNetworkId, hubId, options)
     }
 
     @Override
@@ -97,10 +94,7 @@ class AppChildExecutor implements AppExecutor {
 
     @Override
     InstalledAppWrapper addChildApp(String namespace, String smartAppVersionName, String label, Map properties) {
-        def built = childAppBuilder?.call(namespace, smartAppVersionName, label, properties)
-        def wrapper = (InstalledAppWrapper) built
-        childAppRegistry.add(wrapper?.id as Long, wrapper)
-        return wrapper
+        return (InstalledAppWrapper) childAppBuilder?.call(namespace, smartAppVersionName, label, properties)
     }
 
     @Override

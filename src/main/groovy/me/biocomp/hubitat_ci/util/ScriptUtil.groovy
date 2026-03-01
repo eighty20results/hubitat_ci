@@ -114,7 +114,13 @@ class ScriptUtil {
                 internal.put(property, newValue)
                 return
             } catch (Throwable t) {
-                // best-effort; if anything fails fall through to the userSettingsMap path below (which may NPE if still null).
+                // best-effort; if anything fails and userSettingsMap is still null, throw a clear error below.
+            }
+
+            if (userSettingsMap == null) {
+                throw new IllegalStateException(
+                    "Cannot set property '${property}' because userSettingsMap is null and internal fallback handling failed"
+                )
             }
         }
 

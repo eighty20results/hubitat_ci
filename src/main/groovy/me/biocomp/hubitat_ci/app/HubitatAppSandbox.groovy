@@ -15,7 +15,9 @@ import me.biocomp.hubitat_ci.app.child.InstalledAppWrapperImpl
 import me.biocomp.hubitat_ci.device.child.ChildDeviceRegistry
 import me.biocomp.hubitat_ci.device.child.ChildDeviceWrapperImpl
 import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
+import me.biocomp.hubitat_ci.device.HubitatDeviceScript
 import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
+import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 
 /**
  * This sandbox can load script from file or string,
@@ -163,8 +165,8 @@ class HubitatAppSandbox {
 
             def childScript = deviceSandbox.run(childRunOptions)
 
-            // Wrap existing device wrapper, fall back to GeneratedDeviceInputBase
-            def wrapper = new ChildDeviceWrapperImpl(childScript as DeviceWrapper, dni, parentWrapper?.id, null)
+            // Wrap existing device wrapper from the child script
+            def wrapper = new ChildDeviceWrapperImpl((childScript as HubitatDeviceScript).getDevice(), dni, parentWrapper?.id, null)
             childDeviceRegistry.add(dni, wrapper, childScript)
             return wrapper
         }
@@ -288,7 +290,7 @@ class HubitatAppSandbox {
         objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("InstalledAppWrapper", true) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childAppResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
-        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
+        objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
         objParameter("childAppApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("AppExecutor", v as AppExecutor) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
          boolParameter("withLifecycle", notRequired())
