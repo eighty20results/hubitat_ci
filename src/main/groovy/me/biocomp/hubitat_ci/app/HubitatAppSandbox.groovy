@@ -134,9 +134,13 @@ class HubitatAppSandbox {
 
         Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            if (!resolver) throw new IllegalArgumentException("childDeviceResolver is required to build child devices")
+            if (resolver == null) {
+                throw new IllegalStateException("childDeviceResolver is required to build child devices")
+            }
             File deviceFile = resolver(namespace, typeName)
-            if (!deviceFile?.exists()) throw new IllegalArgumentException("Could not resolve child device file for ${namespace}:${typeName}")
+            if (!(deviceFile?.exists())) {
+                throw new IllegalStateException("Could not resolve child device file for ${namespace}:${typeName}")
+            }
 
             // Merge validation flags so child device respects parent flags (including DontRunScript)
             def childValidationFlags = [] as List<Flags>

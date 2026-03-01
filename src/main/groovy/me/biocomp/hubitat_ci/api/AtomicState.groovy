@@ -59,7 +59,9 @@ trait AtomicState {
      */
     abstract String getValue()
 
-    abstract me.biocomp.hubitat_ci.api.AtomicState fromJson(java.util.Map a) // Original: public static com.hubitat.hub.domain.AtomicState com.hubitat.hub.domain.AtomicState.fromJson(java.util.Map)
+    static me.biocomp.hubitat_ci.api.AtomicState fromJson(java.util.Map a) { // Original: public static com.hubitat.hub.domain.AtomicState com.hubitat.hub.domain.AtomicState.fromJson(java.util.Map)
+        throw new UnsupportedOperationException("AtomicState.fromJson(Map) static factory is not implemented in hubitat_ci stub")
+    }
     abstract void setDataType(java.lang.String a) // Original: public void com.hubitat.hub.domain.State.setDataType(java.lang.String)
     abstract void setDate(java.util.Date a) // Original: public void com.hubitat.hub.domain.State.setDate(java.util.Date)
     abstract void setId(java.lang.Long a) // Original: public void com.hubitat.hub.domain.State.setId(java.lang.Long)
