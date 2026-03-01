@@ -145,7 +145,7 @@ class HubitatDeviceSandbox {
 
         script.initialize(
                 effectiveApi,
-                validator,
+        if (options.withLifecycle && script.metaClass.respondsTo(script, 'initialize', [] as Object[])) {
                 readUserSettingValues(options),
                 options.customizeScriptBeforeRun as Closure)
 
