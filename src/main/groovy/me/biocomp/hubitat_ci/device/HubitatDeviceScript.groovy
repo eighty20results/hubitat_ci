@@ -177,9 +177,15 @@ abstract class HubitatDeviceScript extends Script
     @CompileStatic
     DeviceWrapper getDevice() {
         // If executor provides it, use that.
-        def d = this.@api?.getDevice()
+        DeviceWrapper d = null
+        try {
+            d = this.@api?.getDevice() as DeviceWrapper
+        } catch (Throwable ignored) {
+            // Executor may not support getDevice() (e.g. AppExecutor stub used as childDeviceApi);
+            // fall through to the minimal stub below.
+        }
         if (d != null) {
-            return d as DeviceWrapper
+            return d
         }
 
         // Otherwise, provide a minimal stub.

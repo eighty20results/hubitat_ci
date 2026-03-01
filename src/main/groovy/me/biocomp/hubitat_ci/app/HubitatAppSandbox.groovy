@@ -105,14 +105,18 @@ class HubitatAppSandbox {
                     tn = tn.split(' - ')[0]
                 }
 
+                // normalize namespace: treat null as empty, and replace dots with slashes for path components
+                String ns = namespace ?: ''
+                String nsPath = ns.replace('.', '/')
+
                 // Try local src tree first
                 def candidatePaths = [
-                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/drivers/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/Drivers/${tn}.groovy",
+                        "src/main/groovy/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/drivers/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/Drivers/${tn}.groovy",
                         "Scripts/Devices/${tn}.groovy",
-                        "Scripts/Devices/${namespace}/${tn}.groovy"
+                        "Scripts/Devices/${nsPath}/${tn}.groovy"
                 ]
 
                 for (p in candidatePaths) {
@@ -134,9 +138,13 @@ class HubitatAppSandbox {
 
         Closure buildChildDevice = { String namespace, String typeName, String dni, Long hubId, Map opts ->
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            assert resolver : "childDeviceResolver is required to build child devices"
+            if (resolver == null) {
+                throw new IllegalStateException("childDeviceResolver is required to build child devices")
+            }
             File deviceFile = resolver(namespace, typeName)
-            assert deviceFile?.exists(): "Could not resolve child device file for ${namespace}:${typeName}"
+            if (!(deviceFile?.exists())) {
+                throw new IllegalStateException("Could not resolve child device file for ${namespace}:${typeName}")
+            }
 
             // Merge validation flags so child device respects parent flags (including DontRunScript)
             def childValidationFlags = [] as List<Flags>
@@ -186,15 +194,23 @@ class HubitatAppSandbox {
 
         Closure childAppBuilder = { String namespace, String smartAppVersionName, String label, Map props ->
             Closure<File> appResolver = (Closure<File>) options.childAppResolver
-            assert appResolver : "childAppResolver is required to build child apps"
+            if (!appResolver) throw new IllegalArgumentException("childAppResolver is required to build child apps")
             File appFile = appResolver(namespace, smartAppVersionName)
-            assert appFile?.exists(): "Could not resolve child app file for ${namespace}:${smartAppVersionName}"
+            if (!appFile?.exists()) throw new IllegalArgumentException("Could not resolve child app file for ${namespace}:${smartAppVersionName}")
 
             def appSandbox = new HubitatAppSandbox(appFile)
             def childParentWrapper = new InstalledAppWrapperImpl(nextAppId(), label, smartAppVersionName, parentWrapper?.id)
+
+            // Merge validation flags so child app respects parent flags (including DontRunScript)
+            def childAppValidationFlags = [] as List<Flags>
+            childAppValidationFlags.addAll([Flags.DontValidateDefinition, Flags.DontValidatePreferences])
+            if (options.validationFlags) {
+                childAppValidationFlags.addAll(options.validationFlags as List<Flags>)
+            }
+
             def childAppRunOptions = [
                     api: options.childAppApi ?: options.api,
-                    validationFlags: [Flags.DontValidateDefinition, Flags.DontValidatePreferences],
+                    validationFlags: childAppValidationFlags,
                     parent: childParentWrapper,
                     childDeviceResolver: options.childDeviceResolver,
                     childAppResolver: options.childAppResolver
@@ -205,6 +221,10 @@ class HubitatAppSandbox {
             }
 
             def childScript = appSandbox.run(childAppRunOptions)
+
+            if (childParentWrapper.respondsTo('setScript')) {
+                childParentWrapper.setScript(childScript)
+            }
 
             childAppRegistry.add(childParentWrapper.id, childParentWrapper, childScript)
             return childParentWrapper

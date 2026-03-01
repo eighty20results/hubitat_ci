@@ -72,13 +72,9 @@ class HubitatDeviceSandbox {
             }
 
             Closure<File> resolver = (Closure<File>) options.childDeviceResolver
-            if (!resolver) {
-                throw new IllegalStateException("childDeviceResolver is required to build component devices")
-            }
+            if (!resolver) throw new IllegalArgumentException("childDeviceResolver is required to build component devices")
             File deviceFile = resolver(opOrNamespace as String, typeName as String)
-            if (!deviceFile?.exists()) {
-                throw new IllegalStateException("Could not resolve component device file for ${opOrNamespace}:${typeName}")
-            }
+            if (!deviceFile?.exists()) throw new IllegalArgumentException("Could not resolve component device file for ${opOrNamespace}:${typeName}")
 
             def sandbox = new HubitatDeviceSandbox(deviceFile)
             def childRunOptions = [
