@@ -197,7 +197,7 @@ class HubitatDeviceSandbox {
         objParameter("customizeScriptBeforeRun", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure taking HubitatDeviceScript", v as Closure) })
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
         objParameter("globals", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
-        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceWrapper", v instanceof DeviceWrapper) })
+        objParameter("parent", notRequired(), mustNotBeNull(), { v -> new Tuple2("Object", v) })
         objParameter("childDeviceResolver", notRequired(), mustNotBeNull(), { v -> new Tuple2("Closure", v as Closure) })
         objParameter("childDeviceApi", notRequired(), mustNotBeNull(), { v -> new Tuple2("DeviceExecutor", v as DeviceExecutor) })
         boolParameter("withLifecycle", notRequired())
