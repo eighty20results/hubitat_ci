@@ -105,14 +105,18 @@ class HubitatAppSandbox {
                     tn = tn.split(' - ')[0]
                 }
 
+                // normalize namespace: treat null as empty, and replace dots with slashes for path components
+                String ns = namespace ?: ''
+                String nsPath = ns.replace('.', '/')
+
                 // Try local src tree first
                 def candidatePaths = [
-                        "src/main/groovy/${namespace.replace('.', '/')}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/drivers/${tn}.groovy",
-                        "SubmodulesWithScripts/${namespace}/Drivers/${tn}.groovy",
+                        "src/main/groovy/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/drivers/${tn}.groovy",
+                        "SubmodulesWithScripts/${nsPath}/Drivers/${tn}.groovy",
                         "Scripts/Devices/${tn}.groovy",
-                        "Scripts/Devices/${namespace}/${tn}.groovy"
+                        "Scripts/Devices/${nsPath}/${tn}.groovy"
                 ]
 
                 for (p in candidatePaths) {
