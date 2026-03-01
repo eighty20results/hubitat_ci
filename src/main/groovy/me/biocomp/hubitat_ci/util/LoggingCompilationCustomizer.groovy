@@ -1,6 +1,6 @@
 package me.biocomp.hubitat_ci.util
 
-import groovy.inspect.swingui.AstNodeToScriptVisitor
+//import groovy.inspect.swingui.AstNodeToScriptVisitor
 import org.codehaus.groovy.ast.ClassNode
 import org.codehaus.groovy.classgen.GeneratorContext
 import org.codehaus.groovy.control.CompilationFailedException
@@ -24,8 +24,10 @@ class LoggingCompilationCustomizer extends CompilationCustomizer
 
     void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException
     {
-        StringWriter writer = new StringWriter()
-        new AstNodeToScriptVisitor(writer).visitClass(classNode)
-        out.println writer
+        // Disabled - requires groovy-swing which is too heavy for production
+        // StringWriter writer = new StringWriter()
+        // new AstNodeToScriptVisitor(writer).visitClass(classNode)
+        // out.println writer
+        out.println "AST logging disabled (requires groovy-swing)"
     }
 }

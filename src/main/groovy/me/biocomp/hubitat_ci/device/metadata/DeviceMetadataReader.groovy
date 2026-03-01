@@ -30,6 +30,10 @@ class DeviceMetadataReader implements
                 deviceData,
                 debuggerDetector);
         this.deviceData = deviceData
+        this.states = new ReaderState(['metadata()'   : [],
+                                       'definition()' : ['metadata()'],
+                                       'preferences()': ['metadata()'],
+                                       'section()'    : ['metadata()', 'preferences()']] as Map<String, List<String>>)
     }
 
     @Override
@@ -202,10 +206,7 @@ class DeviceMetadataReader implements
     @Delegate
     private final DeviceExecutor delegate
 
-    private final ReaderState states = new ReaderState(['metadata()'   : [],
-                                                        'definition()' : ['metadata()'],
-                                                        'preferences()': ['metadata()'],
-                                                        'section()'    : ['metadata()', 'preferences()']])
+    private final ReaderState states
 
     private final DeviceValidator validator
 

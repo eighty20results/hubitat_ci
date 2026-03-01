@@ -37,9 +37,8 @@ abstract class HubitatAppScript extends
 
     private Object parent
 
-    @CompileStatic
     private static HashSet<String> InitExistingMethods() {
-        return getMetaClass().methods.collect { m -> m.name } as HashSet<String>;
+        return [:].class.metaClass.methods.collect { m -> m.name } as HashSet<String>;
     }
 
     @TypeChecked
