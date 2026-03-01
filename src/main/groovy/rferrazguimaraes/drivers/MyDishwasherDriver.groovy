@@ -28,8 +28,8 @@ import groovy.json.JsonSlurper
 import groovy.transform.Field
 
 @Field static Map Utils = Utils_create()
-@Field List<String> LOG_LEVELS = ["error", "warn", "info", "debug", "trace"]
-@Field String DEFAULT_LOG_LEVEL = LOG_LEVELS[1]
+@Field static List<String> LOG_LEVELS = ["error", "warn", "info", "debug", "trace"]
+@Field static String DEFAULT_LOG_LEVEL = LOG_LEVELS[1]
 @Field static final Integer eventStreamDisconnectGracePeriod = 30
 @Field static final String driverVersion = "1.7.5"
 

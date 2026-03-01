@@ -15,7 +15,9 @@ import me.biocomp.hubitat_ci.app.child.InstalledAppWrapperImpl
 import me.biocomp.hubitat_ci.device.child.ChildDeviceRegistry
 import me.biocomp.hubitat_ci.device.child.ChildDeviceWrapperImpl
 import me.biocomp.hubitat_ci.device.HubitatDeviceSandbox
+import me.biocomp.hubitat_ci.device.HubitatDeviceScript
 import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
+import me.biocomp.hubitat_ci.api.device_api.DeviceExecutor
 
 /**
  * This sandbox can load script from file or string,
