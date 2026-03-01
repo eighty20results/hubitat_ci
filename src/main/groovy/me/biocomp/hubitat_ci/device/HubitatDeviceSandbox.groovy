@@ -56,7 +56,8 @@ class HubitatDeviceSandbox {
         validateAndUpdateSandboxOptions(options)
 
         // Respect caller-provided validation flags; child sandboxes pass relaxed flags explicitly.
-        def validator = readValidator([validationFlags: (options.validationFlags ?: [])])
+        options.validationFlags = (options.validationFlags ?: [])
+        def validator = readValidator(options)
 
         def registry = new ChildDeviceRegistry()
 
