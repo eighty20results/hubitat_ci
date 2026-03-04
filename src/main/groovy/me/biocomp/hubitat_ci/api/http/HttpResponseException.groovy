@@ -20,7 +20,7 @@ package me.biocomp.hubitat_ci.api.http
  * Thrown when an HTTP response indicates a failure (4xx/5xx).
  * See: https://docs2.hubitat.com/en/developer/allowed-imports
  */
-class HttpResponseException extends Exception {
+class HttpResponseException extends RuntimeException {
     /** The HTTP response status code. */
     int statusCode
     /** The response body (may be null). */
