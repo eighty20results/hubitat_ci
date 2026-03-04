@@ -133,10 +133,6 @@ class SandboxClassLoader extends ClassLoader {
             case 'hubitat.app.ParentDeviceWrapper':
                 return "${basePackageName}common_api.ParentDeviceWrapper"
 
-            // Zigbee DataType - com.hubitat is already rewritten to hubitat above
-            case 'hubitat.zigbee.DataType':
-                return "${basePackageName}device_api.zigbee.DataType"
-
             // groovyx.net.http classes
             case 'groovyx.net.http.HttpResponseException':
                 return "${basePackageName}http.HttpResponseException"
