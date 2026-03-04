@@ -21,21 +21,21 @@ package me.biocomp.hubitat_ci.api.common_api
  */
 class AsyncResponse {
     /** @return HTTP response status code */
-    int getStatus() { throw new UnsupportedOperationException("Stub") }
+    int getStatus() { throw new UnsupportedOperationException("AsyncResponse.getStatus() is a compile-time stub only and cannot be used at runtime.") }
     /** @return HTTP response body as a String */
-    String getData() { throw new UnsupportedOperationException("Stub") }
+    String getData() { throw new UnsupportedOperationException("AsyncResponse.getData() is a compile-time stub only and cannot be used at runtime.") }
     /** @return HTTP response headers as a Map */
-    Map getHeaders() { throw new UnsupportedOperationException("Stub") }
+    Map getHeaders() { throw new UnsupportedOperationException("AsyncResponse.getHeaders() is a compile-time stub only and cannot be used at runtime.") }
     /** @return a specific header value by name */
-    String getHeader(String name) { throw new UnsupportedOperationException("Stub") }
+    String getHeader(String name) { throw new UnsupportedOperationException("AsyncResponse.getHeader(String) is a compile-time stub only and cannot be used at runtime.") }
     /** @return response body parsed as JSON into a Map/List */
-    def getJson() { throw new UnsupportedOperationException("Stub") }
+    def getJson() { throw new UnsupportedOperationException("AsyncResponse.getJson() is a compile-time stub only and cannot be used at runtime.") }
     /** @return response body parsed as XML (GPathResult) */
-    def getXml() { throw new UnsupportedOperationException("Stub") }
+    def getXml() { throw new UnsupportedOperationException("AsyncResponse.getXml() is a compile-time stub only and cannot be used at runtime.") }
     /** @return true if the response indicates an error (status >= 400) */
-    boolean hasError() { throw new UnsupportedOperationException("Stub") }
+    boolean hasError() { throw new UnsupportedOperationException("AsyncResponse.hasError() is a compile-time stub only and cannot be used at runtime.") }
     /** @return the error message if hasError() is true */
-    String getErrorMessage() { throw new UnsupportedOperationException("Stub") }
+    String getErrorMessage() { throw new UnsupportedOperationException("AsyncResponse.getErrorMessage() is a compile-time stub only and cannot be used at runtime.") }
     /** @return response body as raw bytes */
-    byte[] getByteData() { throw new UnsupportedOperationException("Stub") }
+    byte[] getByteData() { throw new UnsupportedOperationException("AsyncResponse.getByteData() is a compile-time stub only and cannot be used at runtime.") }
 }
