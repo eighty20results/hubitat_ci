@@ -165,7 +165,37 @@ def on()
             attribute.possibleValues == null
 
         where:
-            type << ['string', 'number']
+            type << ['string', 'number', 'boolean', 'bool']
+    }
+
+    @Unroll
+    def "attribute() with boolean type '#type' is accepted without possibleValues"(String type) {
+        when:
+            def attribute = readSingleAttribute("attribute 'active', '${type}'")
+
+        then:
+            attribute.name == 'active'
+            attribute.type == type
+            attribute.possibleValues == null
+
+        where:
+            type << ['boolean', 'bool']
+    }
+
+    @Unroll
+    def "attribute() with boolean type '#type' rejects possibleValues"(String type) {
+        when:
+            readSingleAttribute("attribute 'active', '${type}', ['true', 'false']")
+
+        then:
+            AssertionError error = thrown()
+            error.message.contains('active')
+            error.message.contains(type)
+            error.message.contains('enum')
+            error.message.contains("have possible values specified")
+
+        where:
+            type << ['boolean', 'bool']
     }
 
     def "attribute() with invalid type fails"() {
