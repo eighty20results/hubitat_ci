@@ -125,6 +125,26 @@ class SandboxClassLoader extends ClassLoader {
             case 'hubitat.helper.ZigbeeUtils':
                 return "${basePackageName}common_api.ZigbeeUtils"
 
+            // AsyncResponse (hubitat.scheduling.AsyncResponse)
+            case 'hubitat.scheduling.AsyncResponse':
+                return "${basePackageName}common_api.AsyncResponse"
+
+            // ParentDeviceWrapper - com.hubitat is already rewritten to hubitat above
+            case 'hubitat.app.ParentDeviceWrapper':
+                return "${basePackageName}common_api.ParentDeviceWrapper"
+
+            // Zigbee DataType - com.hubitat is already rewritten to hubitat above
+            case 'hubitat.zigbee.DataType':
+                return "${basePackageName}device_api.zigbee.DataType"
+
+            // groovyx.net.http classes
+            case 'groovyx.net.http.HttpResponseException':
+                return "${basePackageName}http.HttpResponseException"
+            case 'groovyx.net.http.Method':
+                return "${basePackageName}http.Method"
+            case 'groovyx.net.http.ContentType':
+                return "${basePackageName}http.ContentType"
+
             // AtomicState is represented in the local API root package rather than under hub.domain
             case 'hubitat.hub.domain.AtomicState':
                 return "${basePackageName}AtomicState"
