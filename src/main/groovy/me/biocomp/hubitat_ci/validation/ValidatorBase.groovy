@@ -300,9 +300,12 @@ class ValidatorBase {
 
             // Note: org.apache.commons.lang3.*, org.quartz.CronExpression,
             // com.google.common.util.concurrent.Striped, com.nimbusds.jose.*,
-            // com.nimbusds.jwt.*, javax.jmdns.*, su.litvak.chromecast.*
-            // are whitelisted by class-name string only (see addAll below)
-            // because those jars are not hubitat_ci compile-time dependencies.
+            // com.nimbusds.jwt.*, javax.jmdns.*, su.litvak.chromecast.*, org.json.*
+            // and org.apache.commons.codec.binary.Base64 are whitelisted by class-name
+            // string only (see addAll in ValidatorBase constructor) because those jars
+            // are not hubitat_ci compile-time dependencies.
+            // Pre-classloader-mapping names (hubitat.*, com.hubitat.*, groovyx.net.http.*)
+            // are also added as strings only because they differ from the mapped class names.
 
             // Hubitat helper classes mapped via SandboxClassLoader
             ColorUtils,
@@ -341,92 +344,17 @@ class ValidatorBase {
         def baseWhitelist = flags.contains(Flags.AllowLegacyImports) ? classOriginalWhiteList : forumDocsWhiteList
         this.classNameWhiteList = initClassNames(extraAllowedClasses, baseWhitelist)
         if (!flags.contains(Flags.AllowLegacyImports)) {
-            // Accept raw helper/framework imports before classloader mapping and all Hubitat-docs imports by name
+            // Append string-only entries that cannot be derived from forumDocsWhiteList.collect { it.name }:
+            //  (a) third-party jars not on the hubitat_ci compile classpath, and
+            //  (b) pre-classloader-mapping names that scripts use before SandboxClassLoader remaps them,
+            //  (c) inner-class name variants not representable as Class literals.
+            // All other allowed imports are already covered by initClassNames(forumDocsWhiteList).
             this.classNameWhiteList.addAll([
-                    // Groovy transforms / extensions
-                    'groovy.transform.Field',
-                    'groovy.transform.CompileStatic',
-                    'groovy.json.JsonSlurperClassic',
-                    'groovy.xml.StreamingMarkupBuilder',
-                    'groovy.sql.Sql',
-
-                    // Java security / crypto
-                    'java.security.MessageDigest',
-                    'java.security.SecureRandom',
-                    'java.security.InvalidKeyException',
-                    'java.security.Signature',
-                    'java.security.PrivateKey',
-                    'java.security.KeyFactory',
-                    'java.security.spec.PKCS8EncodedKeySpec',
-                    'javax.crypto.Mac',
-                    'javax.crypto.spec.SecretKeySpec',
-                    'javax.crypto.spec.IvParameterSpec',
-                    'javax.crypto.Cipher',
-
-                    // Concurrency
-                    'java.util.concurrent.ConcurrentHashMap',
-                    'java.util.concurrent.ConcurrentLinkedQueue',
-                    'java.util.concurrent.CopyOnWriteArrayList',
-                    'java.util.concurrent.Semaphore',
-                    'java.util.concurrent.SynchronousQueue',
-                    'java.util.concurrent.TimeUnit',
-                    'java.util.concurrent.atomic.AtomicInteger',
-                    'java.util.concurrent.atomic.AtomicIntegerArray',
-
-                    // Regex / networking
-                    'java.util.regex.Pattern',
-                    'java.util.regex.Matcher',
-                    'java.net.URL',
-                    'java.math.RoundingMode',
-                    'java.util.BitSet',
-                    'java.util.Locale',
+                    // Inner-class variant not representable as a Class literal
                     'java.util.Locale$Builder',
                     'java.util.Locale.Builder',
-                    'java.lang.StringBuffer',
-                    'java.io.OutputStream',
-                    'java.lang.CharSequence',
-                    'java.lang.Number',
-                    'java.lang.Character',
-                    'java.lang.Throwable',
 
-                    // java.time.*
-                    'java.time.Clock',
-                    'java.time.Instant',
-                    'java.time.Duration',
-                    'java.time.Period',
-                    'java.time.LocalDate',
-                    'java.time.LocalDateTime',
-                    'java.time.LocalTime',
-                    'java.time.MonthDay',
-                    'java.time.OffsetDateTime',
-                    'java.time.OffsetTime',
-                    'java.time.Year',
-                    'java.time.YearMonth',
-                    'java.time.ZonedDateTime',
-                    'java.time.ZoneId',
-                    'java.time.ZoneOffset',
-                    'java.time.DayOfWeek',
-                    'java.time.Month',
-                    'java.time.format.DateTimeFormatter',
-                    'java.time.format.DateTimeFormatterBuilder',
-                    'java.time.temporal.TemporalAdjusters',
-
-                    // java.util.zip.*
-                    'java.util.zip.Deflater',
-                    'java.util.zip.Inflater',
-                    'java.util.zip.DeflaterInputStream',
-                    'java.util.zip.DeflaterOutputStream',
-                    'java.util.zip.GZIPInputStream',
-                    'java.util.zip.GZIPOutputStream',
-                    'java.util.zip.InflaterInputStream',
-                    'java.util.zip.InflaterOutputStream',
-                    'java.util.zip.ZipInputStream',
-                    'java.util.zip.ZipOutputStream',
-                    'java.util.zip.DataFormatException',
-                    'java.util.zip.ZipException',
-                    'java.util.zip.ZipError',
-
-                    // Apache Commons
+                    // Apache Commons (not on compile classpath)
                     'org.apache.commons.codec.binary.Base64',
                     'org.apache.commons.lang3.StringEscapeUtils',
                     'org.apache.commons.lang3.StringUtils',
@@ -435,20 +363,20 @@ class ValidatorBase {
                     'org.apache.xerces.dom.DocumentImpl',
                     'org.apache.xerces.dom.ElementImpl',
 
-                    // org.json
+                    // org.json (not on compile classpath)
                     'org.json.JSONArray',
                     'org.json.JSONException',
                     'org.json.JSONObject',
                     'org.json.JSONObject$Null',
                     'org.json.JSONObject.Null',
 
-                    // Quartz
+                    // Quartz (not on compile classpath)
                     'org.quartz.CronExpression',
 
-                    // Google Guava
+                    // Google Guava (not on compile classpath)
                     'com.google.common.util.concurrent.Striped',
 
-                    // Nimbus JOSE + JWT
+                    // Nimbus JOSE + JWT (not on compile classpath)
                     'com.nimbusds.jose.PlainObject',
                     'com.nimbusds.jose.JWSObject',
                     'com.nimbusds.jose.Payload',
@@ -473,12 +401,12 @@ class ValidatorBase {
                     'com.nimbusds.jwt.JWTClaimsSet',
                     'com.nimbusds.jwt.JWTClaimsSet$Builder',
 
-                    // jmDNS
+                    // jmDNS (not on compile classpath)
                     'javax.jmdns.JmDNS',
                     'javax.jmdns.ServiceEvent',
                     'javax.jmdns.impl.ServiceEventImpl',
 
-                    // ChromeCast (su.litvak)
+                    // ChromeCast (not on compile classpath)
                     'su.litvak.chromecast.api.v2.ChromeCasts',
 
                     // Hubitat helper interfaces (pre-classloader-mapping names)
@@ -492,18 +420,18 @@ class ValidatorBase {
                     'hubitat.helper.RMUtils',
                     'hubitat.helper.ZigbeeUtils',
 
-                    // Hubitat scheduling
+                    // Hubitat scheduling (pre-classloader-mapping name)
                     'hubitat.scheduling.AsyncResponse',
 
-                    // Hubitat app/device wrappers
+                    // Hubitat app/device wrappers (pre-classloader-mapping names)
                     'com.hubitat.app.ParentDeviceWrapper',
                     'hubitat.app.ParentDeviceWrapper',
 
-                    // Zigbee DataType
+                    // Zigbee DataType (pre-classloader-mapping names)
                     'com.hubitat.zigbee.DataType',
                     'hubitat.zigbee.DataType',
 
-                    // groovyx.net.http
+                    // groovyx.net.http (user-visible names; forumDocsWhiteList holds the me.biocomp.hubitat_ci.api.http.* wrappers)
                     'groovyx.net.http.HttpResponseException',
                     'groovyx.net.http.Method',
                     'groovyx.net.http.ContentType',
