@@ -115,11 +115,39 @@ class DeviceValidator extends
                 capabilityName)): "capability '${capabilityName}' is not supported. Valid capabilities are: ${Capabilities.capabilitiesByPrettyName.keySet() + Capabilities.capabilitiesByDriverDefinition.keySet()}."
     }
 
+    /**
+     * Canonical set of valid attribute type strings for Hubitat device drivers.
+     * 'bool' is accepted as a legacy alias for 'boolean' (as documented in Hubitat driver overview).
+     */
+    static final Set<String> VALID_ATTRIBUTE_TYPES =
+            ['string', 'number', 'enum', 'json_object', 'boolean', 'bool'] as Set<String>
+
+    /**
+     * Normalise a raw attribute type string to its canonical form.
+     * Maps the legacy 'bool' alias to 'boolean'; all others are returned unchanged.
+     *
+     * @param rawType the type string as declared in the driver source
+     * @return canonical type string, or the original value if no alias applies
+     */
+    static String normalizeAttributeType(String rawType) {
+        return rawType == 'bool' ? 'boolean' : rawType
+    }
+
+    /**
+     * Validate a single attribute declaration.
+     * Accepted scalar types: string, number, json_object, boolean (alias: bool).
+     * The enum type additionally requires a non-empty possibleValues list.
+     * No other type may carry possibleValues.
+     *
+     * @param attribute the attribute to validate
+     */
     void validateAttribute(Attribute attribute) {
         assert attribute.name: "Attribute ${attribute} doesn't have a name."
         assert attribute.type: "Attribute ${attribute} doesn't have a type."
 
-        assert attribute.type == 'string' || attribute.type == 'enum' || attribute.type == 'number' || attribute.type == 'json_object': "Attribute ${attribute}'s type '${attribute.type}' is not supported."
+        assert VALID_ATTRIBUTE_TYPES.contains(attribute.type): \
+            "Attribute ${attribute}'s type '${attribute.type}' is not supported. Supported types: ${VALID_ATTRIBUTE_TYPES}."
+
         if (attribute.type == 'enum') {
             assert attribute.possibleValues != null && attribute.possibleValues.size() != 0: "Attribute ${attribute} with 'enum' type must have possible values specified."
         } else {

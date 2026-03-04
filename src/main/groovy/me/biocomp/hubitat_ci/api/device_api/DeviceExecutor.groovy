@@ -120,7 +120,8 @@ trait DeviceDefinition {
      *
      * For any supported attribute, it is expected that the Device Handler creates and sends Events with the name of the attribute in the parse() method.
      * @param attributeName
-     * @param attributeType - vailable types are “string”, “number”, and “enum”
+     * @param attributeType - available types are "string", "number", "enum", "json_object", "boolean" (alias: "bool").
+     *                        "boolean" / "bool" attributes hold {@code true} or {@code false} values (or numeric 0/1).
      * @param possibleValues -  the possible values for this attribute. Only valid with the "enum" attributeType.
      */
     abstract void attribute(String attributeName, String attributeType, List<String> possibleValues = null)
