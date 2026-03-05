@@ -70,9 +70,9 @@ class DeviceValidator extends
         stringParameter("importUrl", notRequired(), mustNotBeEmpty())
 
         // Hubitat supports singleThreaded option in driver definitions.
-        // The value is a String ("true" or "false"), not a boolean.
+        // The value can be a String ("true" or "false") or a Boolean (true or false).
         // See: https://docs2.hubitat.com/en/developer/driver/overview
-        stringParameter("singleThreaded", notRequired(), mustNotBeEmpty())
+        stringOrBoolParameter("singleThreaded", notRequired())
     }
 
     private static String printMethod(Method m)

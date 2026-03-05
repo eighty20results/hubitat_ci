@@ -219,6 +219,42 @@ class ParametersToValidate
                 }))
     }
 
+    /**
+     * Accepts String, GString, or Boolean values. The value must be "true" or "false"
+     * (case-sensitive). If the value is a Boolean, it is converted to its string representation.
+     * An empty string is rejected.
+     */
+    @CompileStatic
+    void stringOrBoolParameter(String name, IsRequired required)
+    {
+        addParameter(new Parameter(
+                name, required, null,
+                { EnumSet<Flags> validationFlags, String context, def value ->
+                    assert value != null: "${context}: '${name}' value can't be null"
+
+                    String val = null
+
+                    if (value instanceof Boolean)
+                    {
+                        val = value.toString()
+                    }
+                    else if (value instanceof String)
+                    {
+                        val = value as String
+                    }
+                    else if (value instanceof GString)
+                    {
+                        val = (value as GString).toString()
+                    }
+                    else
+                    {
+                        assert false: "${context}: '${name}''s value must be String/GString or Boolean, not ${value.class}"
+                    }
+
+                    assert val == "true" || val == "false": "${context}: '${name}''s value must be 'true' or 'false', not '${val}'"
+                }))
+    }
+
     @CompileStatic
     void enumStringParameter(String name, IsRequired required, List<String> values)
     {
