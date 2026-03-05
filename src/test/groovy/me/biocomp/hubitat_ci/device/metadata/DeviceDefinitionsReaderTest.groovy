@@ -66,6 +66,26 @@ metadata{
             definition.options.singleThreaded == 'false'
     }
 
+    def "Reading definition() with singleThreaded set to boolean true"() {
+        setup:
+            def definition = readDefinition("""
+    definition(name: "test device", namespace: "yournamespace", author: "your name", singleThreaded: true){
+    }""", validationFlags: [Flags.DontValidateCapabilities, Flags.DontRequireParseMethodInDevice])
+
+        expect:
+            definition.options.singleThreaded == true
+    }
+
+    def "Reading definition() with singleThreaded set to boolean false"() {
+        setup:
+            def definition = readDefinition("""
+    definition(name: "test device", namespace: "yournamespace", author: "your name", singleThreaded: false){
+    }""", validationFlags: [Flags.DontValidateCapabilities, Flags.DontRequireParseMethodInDevice])
+
+        expect:
+            definition.options.singleThreaded == false
+    }
+
     def "definition() with empty singleThreaded fails"() {
         when:
             readDefinition("""
@@ -75,7 +95,7 @@ metadata{
         then:
             AssertionError e = thrown()
             e.message.contains('singleThreaded')
-            e.message.contains("can't be empty")
+            e.message.contains("'true' or 'false'")
     }
 
     @Unroll
