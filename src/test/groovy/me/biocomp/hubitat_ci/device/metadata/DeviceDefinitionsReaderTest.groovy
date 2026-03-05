@@ -43,6 +43,41 @@ metadata{
             definition.options.importUrl == 'http://example.com/myscript.groovy'
     }
 
+    def "Reading definition() with singleThreaded option"() {
+        setup:
+            def definition = readDefinition("""
+    definition(name: "test device", namespace: "yournamespace", author: "your name", singleThreaded: "true"){
+    }""", validationFlags: [Flags.DontValidateCapabilities, Flags.DontRequireParseMethodInDevice])
+
+        expect:
+            definition.options.name == 'test device'
+            definition.options.namespace == 'yournamespace'
+            definition.options.author == 'your name'
+            definition.options.singleThreaded == 'true'
+    }
+
+    def "Reading definition() with singleThreaded set to false"() {
+        setup:
+            def definition = readDefinition("""
+    definition(name: "test device", namespace: "yournamespace", author: "your name", singleThreaded: "false"){
+    }""", validationFlags: [Flags.DontValidateCapabilities, Flags.DontRequireParseMethodInDevice])
+
+        expect:
+            definition.options.singleThreaded == 'false'
+    }
+
+    def "definition() with empty singleThreaded fails"() {
+        when:
+            readDefinition("""
+    definition(name: "test device", namespace: "yournamespace", author: "your name", singleThreaded: ""){
+    }""", validationFlags: [Flags.DontValidateCapabilities, Flags.DontRequireParseMethodInDevice])
+
+        then:
+            AssertionError e = thrown()
+            e.message.contains('singleThreaded')
+            e.message.contains("can't be empty")
+    }
+
     @Unroll
     def "definition(#params)'s parameter #missingParam is required"(String params, String missingParam) {
         when:

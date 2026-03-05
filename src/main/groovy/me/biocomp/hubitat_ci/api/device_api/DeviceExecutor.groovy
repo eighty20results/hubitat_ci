@@ -338,6 +338,9 @@ trait DeviceMetadata implements
      * <li><code>namespace</code> (String) The namespace for this Device Handler. This should be your github user name. This is used
      * when looking up Device Handlers by name to ensure the correct one is found, even if someone else has used the same name.
      * <li><code>author</code> (String) The author of this Device Handler.</li>
+     * <li><code>importUrl</code> (String, optional) URL from which the driver source can be imported.</li>
+     * <li><code>singleThreaded</code> (String, optional) When set to "true", ensures only one instance of the driver
+     * runs at a time. Valid values: "true", "false".</li>
      * </ul>
      * @param makeContents
      */
