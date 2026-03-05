@@ -34,7 +34,7 @@ abstract class IntegrationDeviceWrapper implements DeviceWrapper {
         }
         if (raw instanceof String) {
             def lower = raw.toLowerCase(Locale.ROOT)
-            assert lower == 'true' || lower == 'false': \
+            assert lower == 'true' || lower == 'false':
                 "Cannot coerce value '${raw}' to boolean – expected 'true', 'false', 0, 1, or a Boolean."
             return lower == 'true'
         }
