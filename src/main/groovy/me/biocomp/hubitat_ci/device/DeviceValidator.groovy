@@ -145,7 +145,7 @@ class DeviceValidator extends
         assert attribute.name: "Attribute ${attribute} doesn't have a name."
         assert attribute.type: "Attribute ${attribute} doesn't have a type."
 
-        assert VALID_ATTRIBUTE_TYPES.contains(attribute.type): \
+        assert VALID_ATTRIBUTE_TYPES.contains(attribute.type):
             "Attribute ${attribute}'s type '${attribute.type}' is not supported. Supported types: ${VALID_ATTRIBUTE_TYPES}."
 
         if (attribute.type == 'enum') {
