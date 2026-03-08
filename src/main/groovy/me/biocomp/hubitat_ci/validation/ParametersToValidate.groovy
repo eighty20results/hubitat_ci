@@ -261,11 +261,33 @@ class ParametersToValidate
         assert values
 
         def validValues = new HashSet<String>(values)
+        // Build a case-insensitive lookup map for Hubitat compatibility
+        def caseInsensitiveMap = new HashMap<String, String>()
+        values.each { validValue ->
+            caseInsensitiveMap.put(validValue.toLowerCase(), validValue)
+        }
 
         addParameter(new Parameter(name, required, [],
                 { EnumSet<Flags> validationFlags, String context, def value ->
                     def val = validateStringValue(validationFlags, context, name, value, CanBeEmpty.No)
-                    assert validValues.contains(val) : "${context}: '${name}''s value ('${val}') is not supported. Valid values: ${validValues}"
+
+                    // First try exact match (case-sensitive)
+                    if (validValues.contains(val)) {
+                        return
+                    }
+
+                    // If exact match fails, try case-insensitive match (Hubitat behavior)
+                    def lowerVal = val.toLowerCase()
+                    def canonicalValue = caseInsensitiveMap.get(lowerVal)
+
+                    if (canonicalValue != null) {
+                        // Case-insensitive match found - log warning
+                        System.err.println("WARNING: ${context}: '${name}' value '${val}' differs in case from canonical value '${canonicalValue}'. " +
+                                "Hubitat accepts this case-insensitively, but consider using the exact case for clarity.")
+                    } else {
+                        // No match at all - fail validation
+                        assert false : "${context}: '${name}''s value ('${val}') is not supported. Valid values: ${validValues}"
+                    }
                 }))
     }
 
