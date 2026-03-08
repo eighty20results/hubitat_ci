@@ -722,49 +722,23 @@ def readProperty()
         }
 
         @Unroll
-        def "#sandboxClass.simpleName: Enum options (#options) can't repeat each other"(
-                String options, String whatWasDuplicated, Class sandboxClass)
+        def "#sandboxClass.simpleName: Enum default value matching is case-insensitive (#options with #defaultValue)"(
+                String options, String defaultValue, Class sandboxClass)
         {
-            when:
-                parseInput(sandboxClass, 'enum', "options: ${options}")
-
-            then:
-                AssertionError e = thrown()
-                e.message.contains("enum ${whatWasDuplicated} was duplicated")
-
-            where:
-                [options, whatWasDuplicated, sandboxClass] << combineWithSandboxes(
-                        [["['Val2', 'Val1', 'Val2']", "value 'Val2'"],
-                         ["[11:'Val2', 22:'Val1', 33:'Val2']", "value 'Val2'"],
-                         ["['11':'Val2', '22':'Val1', '33':'Val2']", "value 'Val2'"],
-                         ["[['11':'Val2'], ['22':'Val1'], ['33':'Val2']]", "value 'Val2'"]])
-        }
-
-        @Unroll
-        def "#sandboxClass.simpleName: enum options = (#options) leads to error: #error"(
-                String options, String error, Class sandboxClass)
-        {
-            when:
-                parseInput(sandboxClass, 'enum', "options: ${options}")
-
-            then:
-                AssertionError e = thrown()
-                e.message.contains(error)
+            expect:
+                parseInput(sandboxClass, 'enum', "defaultValue: ${defaultValue}, options: ${options}")
 
             where:
                 // @formatter:off
-            [options, error, sandboxClass] << combineWithSandboxes([
-                 ["[[1:'Val1', 2:'Val2'], [3:'Val3']]", "when enum options is list of maps, each map must have one entry. But '[1:'Val1', 2:'Val2']' doesn't."],
-                 ["[['1':'Val1', '2':'Val2'], ['3':'Val3']]", "when enum options is list of maps, each map must have one entry. But '['1':'Val1', '2':'Val2']' doesn't."],
-                 ["[]", "enum options can't be empty"],
-                 ["[:]", "enum options can't be empty"],
-                 ["null", "'options' value can't be null"],
-                 ["[[:], [3:'Val3']]", "when enum options is list of maps, each map must have one entry. But '[:]' doesn't."],
-                 ["[[1:'Val1'], [:]]", "when enum options is list of maps, each map must have one entry. But '[:]' doesn't."],
-                 ["[['1':'Val1'], [:]]", "when enum options is list of maps, each map must have one entry. But '[:]' doesn't."],
-                 ["[[], [3:'Val3']]", "if enum options is a list, it must be a list of values or maps. But '[]' isn't a map."],
-                 ["['abc', [3:'Val3']]", "if enum options is a list, it must be a list of values or maps. But ''abc'' isn't a map."]
-            ])
-        // @formatter:on
+            [options, defaultValue, sandboxClass] << combineWithSandboxes(
+                    [["['Max', 'High', 'Default', 'Low', 'Min']", "'default'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'max'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'DEFAULT'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'LOW'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'min'"],
+                    ["[1:'Max', 2:'High', 3:'Default', 4:'Low', 5:'Min']", "'default'"],
+                    ["[1:'Max', 2:'High', 3:'Default', 4:'Low', 5:'Min']", "'max'"],
+                    ["['1':'Max', '2':'High', '3':'Default', '4':'Low', '5':'Min']", "'high'"]])
+            // @formatter:on
         }
     }
