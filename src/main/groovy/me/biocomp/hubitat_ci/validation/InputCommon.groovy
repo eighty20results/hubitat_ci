@@ -99,6 +99,7 @@ abstract class InputCommon {
 
     /**
      * Insert unique values from source into uniqueValues, assert if there are duplicates.
+     * Comparison is case-insensitive to match Hubitat's behavior.
      * @param keyOrValue - word 'key' or 'value' for better error message.
      * @param source - gets list from here
      * @param uniqueValues - receives list of unique enum values
@@ -107,12 +108,23 @@ abstract class InputCommon {
         def unique = new HashSet<String>()
         source.each {
             def stringVal = it.toString()
+            def lowerVal = stringVal.toLowerCase()
 
-            assert !unique.contains(stringVal): "${this}: enum ${keyOrValue} '${it}' was duplicated"
+            assert !unique.contains(lowerVal): "${this}: enum ${keyOrValue} '${it}' was duplicated"
 
-            unique.add(stringVal)
+            unique.add(lowerVal)
             uniqueValues.add(stringVal)
         }
+    }
+
+    /**
+     * Case-insensitive check if a value exists in the list.
+     * @param list the list of strings to search
+     * @param value the value to find (case-insensitive)
+     * @return true if a case-insensitive match is found
+     */
+    private static boolean containsCaseInsensitive(List<String> list, String value) {
+        return list.any { it.equalsIgnoreCase(value) }
     }
 
     void validateEnumInput() {
@@ -150,7 +162,8 @@ abstract class InputCommon {
 
         if (defaultValue.hasValue) {
             final def addedEnumValues = enumValues ? " or ${enumValues}" : ""
-            assert enumDisplayValues.contains(defaultValue.value.toString()) || enumValues.contains(defaultValue.value.toString()): "${this}: defaultValue '${defaultValue.value}' is not one of valid values: ${enumDisplayValues}${addedEnumValues}"
+            final def defaultValueStr = defaultValue.value.toString()
+            assert containsCaseInsensitive(enumDisplayValues, defaultValueStr) || containsCaseInsensitive(enumValues, defaultValueStr): "${this}: defaultValue '${defaultValue.value}' is not one of valid values: ${enumDisplayValues}${addedEnumValues}"
         }
     }
 
@@ -162,9 +175,13 @@ abstract class InputCommon {
         if (defaultValue.hasValue) {
             if (type == 'enum') {
                 final def defaultValueStr = defaultValue.value.toString()
-                final def indexOfDisplayValue = enumDisplayValues.findIndexOf { it == defaultValueStr }
-                if (indexOfDisplayValue == -1) // Looks like enum value (not display value) was used
-                {
+                final def indexOfDisplayValue = enumDisplayValues.findIndexOf { it.equalsIgnoreCase(defaultValueStr) }
+                if (indexOfDisplayValue == -1) { // Looks like enum value (not display value) was used, or need to find by enum value
+                    final def indexOfEnumValue = enumValues.findIndexOf { it.equalsIgnoreCase(defaultValueStr) }
+                    if (indexOfEnumValue != -1) {
+                        return NullableOptional.withValue(enumValues[indexOfEnumValue])
+                    }
+                    // If not found in either, return as-is (will be caught by validation if invalid)
                     return NullableOptional.withValue(defaultValueStr)
                 }
 
