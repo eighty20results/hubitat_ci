@@ -678,6 +678,33 @@ def readProperty()
         }
 
         @Unroll
+        def "#sandboxClass.simpleName: Enum input rejects invalid or duplicate options (#options)"(
+                String options, String expectedMessagePart, Class sandboxClass)
+        {
+            when:
+                parseInput(sandboxClass, 'enum', "options: ${options}")
+
+            then:
+                AssertionError e = thrown()
+                e.message.contains(expectedMessagePart)
+
+            where:
+                // @formatter:off
+            [options, expectedMessagePart, sandboxClass] << combineWithSandboxes(
+                    [["[]",                                "enum options can't be empty"],
+                     ["[:]",                               "enum options can't be empty"],
+                     ["['Val1', 'Val1']",                 "was duplicated"],
+                     ["['Val1', 'val1']",                 "was duplicated"],
+                     ["[1:'High', 2:'high']",             "was duplicated"],
+                     ["['A':'Val1', 'a':'Val2']",         "was duplicated"],
+                     ["[['42':'Val1'], ['42':'Val2']]",   "was duplicated"],
+                     ["[['42':'Val1'], ['43':'val1']]",   "was duplicated"],
+                     ["[['42':'Val1', '99':'ValX']]",     "each map must have one entry"],
+                     ["[['42':'Val1'], 'oops']",          "isn't a map"]])
+            // @formatter:on
+        }
+
+        @Unroll
         def "#sandboxClass.simpleName: Failing cases: enum default value must be one of its options (#options)"(
                 String options, String expectedValidValues, Class sandboxClass)
         {

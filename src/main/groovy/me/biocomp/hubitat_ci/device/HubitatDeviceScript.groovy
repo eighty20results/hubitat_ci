@@ -91,10 +91,35 @@ abstract class HubitatDeviceScript extends Script
         api = this.metadataReader
 
         this.api = api
+        rebindStateAfterApiInitialization()
 
         this.userSettingsMap = this.metadataReader.settings
 
         this.validator = validator
+    }
+
+    /**
+     * If state was accessed before api wiring completed, migrate early writes from
+     * internal fallback state into executor-backed state and clear cached wrapper.
+     */
+    @CompileStatic
+    private void rebindStateAfterApiInitialization() {
+        Map executorState = null
+        try {
+            executorState = this.@api?.getState()
+        } catch (Throwable ignored) {
+            executorState = null
+        }
+
+        if (executorState != null) {
+            if (this.@internalState != null && !this.@internalState.is(executorState)) {
+                executorState.putAll(this.@internalState)
+            }
+            this.@internalState = executorState
+        }
+
+        // Force next getState() call to wrap the latest backing store.
+        this.@cachedStateMap = null
     }
 
     /**

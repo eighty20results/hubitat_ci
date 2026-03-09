@@ -65,17 +65,24 @@ abstract class IntegrationDeviceSpecification extends Specification {
 
         deviceScript.getMetaClass()."$methodName" = stub
 
-        // Many Hubitat APIs (httpGet/httpPost/now/etc) are implemented by the executor delegate.
-        // Register with executor-level stub registry when available.
+        registerExecutorStub(methodName, stub)
+        registerExecutorMetaClassStub(methodName, stub)
+    }
+
+    // Many Hubitat APIs (httpGet/httpPost/now/etc) are implemented by the executor delegate.
+    // Registering directly keeps integration test stubbing consistent for both script and API calls.
+    private void registerExecutorStub(String methodName, Closure stub) {
         try {
-            if (deviceExecutor?.metaClass?.respondsTo(deviceExecutor, 'registerMethodStub', String, Closure)) {
-                deviceExecutor.registerMethodStub(methodName, stub)
-            }
+            deviceExecutor?.registerMethodStub(methodName, stub)
+        } catch (MissingMethodException ignored) {
+            // Backward compatibility for executors without registerMethodStub.
         } catch (Throwable ignored) {
             // Best effort only.
         }
+    }
 
-        // Also mirror on executor metaclass for helper calls resolved there.
+    // Mirror on executor metaclass for helper calls resolved there.
+    private void registerExecutorMetaClassStub(String methodName, Closure stub) {
         try {
             deviceExecutor?.getMetaClass()."$methodName" = stub
         } catch (Throwable ignored) {
