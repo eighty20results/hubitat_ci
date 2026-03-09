@@ -17,6 +17,7 @@ import me.biocomp.hubitat_ci.util.integration.PassthroughScheduler
 */
 abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughScheduler {
     private static final groovy.json.JsonSlurper JSON_SLURPER = new groovy.json.JsonSlurper()
+    private final Map<String, Closure> methodStubs = [:]
 
     IntegrationDeviceExecutor() {
         this((BaseScheduler) null)
@@ -72,6 +73,106 @@ abstract class IntegrationDeviceExecutor implements DeviceExecutor, PassthroughS
 
     /*****************************************************************
      * END SECTION: Select methods from DeviceExecutor trait
+     *****************************************************************/
+
+    /*****************************************************************
+     * BEGIN SECTION: HTTP methods from BaseHttp trait
+     *****************************************************************/
+
+    /**
+     * Register or replace a named method stub used by integration tests.
+     * Supported API names include (at minimum): httpGet, httpPost.
+     */
+    void registerMethodStub(String methodName, Closure stub) {
+        if (stub == null) {
+            methodStubs.remove(methodName)
+            return
+        }
+        methodStubs.put(methodName, stub)
+    }
+
+    private Closure findStub(List<String> keys) {
+        for (String key in keys) {
+            Closure stub = methodStubs.get(key)
+            if (stub != null) {
+                return stub
+            }
+        }
+        return null
+    }
+
+    /**
+     * HTTP GET method stub for testing.
+     * Tests should stub/mock this method to provide appropriate responses.
+     */
+    @Override
+    Object httpGet(String address, Closure handler) {
+        Closure stub = findStub(['httpGetString', 'httpGet'])
+        if (stub != null) {
+            return stub.call(address, handler)
+        }
+
+        throw new UnsupportedOperationException(
+            "httpGet(String, Closure) is not implemented in IntegrationDeviceExecutor. " +
+            "Please stub/mock this method in your test."
+        )
+    }
+
+    /**
+     * HTTP GET method stub for testing.
+     * Tests should stub/mock this method to provide appropriate responses.
+     */
+    @Override
+    Object httpGet(Map options, Closure handler) {
+        Closure stub = findStub(['httpGetMap', 'httpGet'])
+        if (stub != null) {
+            return stub.call(options, handler)
+        }
+
+        throw new UnsupportedOperationException(
+            "httpGet(Map, Closure) is not implemented in IntegrationDeviceExecutor. " +
+            "Please stub/mock this method in your test."
+        )
+    }
+
+    /**
+     * HTTP POST method stub for testing.
+     * Tests should stub/mock this method to provide appropriate responses.
+     */
+    @Override
+    void httpPost(Map options, Closure handler) {
+        Closure stub = findStub(['httpPostMap', 'httpPost'])
+        if (stub != null) {
+            stub.call(options, handler)
+            return
+        }
+
+        throw new UnsupportedOperationException(
+            "httpPost(Map, Closure) is not implemented in IntegrationDeviceExecutor. " +
+            "Please stub/mock this method in your test."
+        )
+    }
+
+    /**
+     * HTTP POST method stub for testing.
+     * Tests should stub/mock this method to provide appropriate responses.
+     */
+    @Override
+    void httpPost(String address, String request, Closure handler) {
+        Closure stub = findStub(['httpPostString', 'httpPost'])
+        if (stub != null) {
+            stub.call(address, request, handler)
+            return
+        }
+
+        throw new UnsupportedOperationException(
+            "httpPost(String, String, Closure) is not implemented in IntegrationDeviceExecutor. " +
+            "Please stub/mock this method in your test."
+        )
+    }
+
+    /*****************************************************************
+     * END SECTION: HTTP methods from BaseHttp trait
      *****************************************************************/
 
     @Override

@@ -1,6 +1,7 @@
 package me.biocomp.hubitat_ci.util.integration
 
 import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
+import java.util.Locale
 
 /**
  * The IntegrationDeviceWrapper is a partial implementation of the DeviceWrapper trait.
@@ -15,6 +16,15 @@ import me.biocomp.hubitat_ci.api.common_api.DeviceWrapper
  */
 abstract class IntegrationDeviceWrapper implements DeviceWrapper {
     private Map attributeValues = [:]
+    private Map settingValues = [:]
+
+    /**
+     * Bind this wrapper to the script's settings map so that calls to
+     * {@code device.updateSetting(...)} are reflected in {@code settings.*}.
+     */
+    void bindSettingsMap(Map settingsMap) {
+        this.settingValues = (settingsMap != null) ? settingsMap : [:]
+    }
 
     /**
      * Coerce a raw value to a {@code Boolean}.
@@ -57,5 +67,76 @@ abstract class IntegrationDeviceWrapper implements DeviceWrapper {
     @Override
     def currentValue(String attributeName, boolean skipCache) {
         return attributeValues[attributeName]
+    }
+
+    @Override
+    void updateSetting(String name, Boolean value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, Date value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, Double value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, List value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, Long value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, String value) {
+        setSettingValue(name, value)
+    }
+
+    @Override
+    void updateSetting(String name, Map value) {
+        setSettingValue(name, unpackTypedSetting(value))
+    }
+
+    @Override
+    void clearSetting(String settingName) {
+        settingValues?.remove(settingName)
+    }
+
+    @Override
+    void removeSetting(String settingName) {
+        settingValues?.remove(settingName)
+    }
+
+    @Override
+    Object getSetting(String settingName) {
+        return settingValues?.get(settingName)
+    }
+
+    protected void setSettingValue(String name, Object value) {
+        if (settingValues == null) {
+            settingValues = [:]
+        }
+        settingValues.put(name, value)
+    }
+
+    protected static Object unpackTypedSetting(Map value) {
+        if (value == null || !value.containsKey('value')) {
+            return value
+        }
+
+        Object rawValue = value.get('value')
+        String settingType = value.get('type')?.toString()?.toLowerCase(Locale.ROOT)
+        if (settingType in ['bool', 'boolean']) {
+            return coerceToBooleanValue(rawValue)
+        }
+
+        return rawValue
     }
 }
