@@ -8,6 +8,7 @@ import me.biocomp.hubitat_ci.device.metadata.DeviceMetadataReader
 import groovy.transform.CompileStatic
 import groovy.transform.TypeChecked
 import me.biocomp.hubitat_ci.util.ScriptUtil
+import me.biocomp.hubitat_ci.util.PropertyAssignableMap
 import me.biocomp.hubitat_ci.validation.DebuggerDetector
 
 /**
@@ -26,11 +27,24 @@ abstract class HubitatDeviceScript extends Script
 
     // Hubitat provides a persistent state map; drivers commonly use it.
     // In hubitat_ci we delegate state storage to the executor API.
+    // Both state and atomicState return the same backing store (Hubitat behavior).
     @CompileStatic
     Map getState() {
-        Map s = this.@api?.getState()
+        if (this.@cachedStateMap != null) {
+            return this.@cachedStateMap
+        }
+
+        Map s = null
+        try {
+            s = this.@api?.getState()
+        } catch (Throwable ignored) {
+            // API might not be fully initialized or delegate might be null
+            s = null
+        }
+
         if (s != null) {
-            return s
+            this.@cachedStateMap = new PropertyAssignableMap(s)
+            return this.@cachedStateMap
         }
 
         // Some tests may provide an API mock without getState() stubbing.
@@ -38,10 +52,22 @@ abstract class HubitatDeviceScript extends Script
         if (this.@internalState == null) {
             this.@internalState = [:]
         }
-        return this.@internalState
+        this.@cachedStateMap = new PropertyAssignableMap(this.@internalState)
+        return this.@cachedStateMap
+    }
+
+    /**
+     * On Hubitat, atomicState and state use the same backing store.
+     * atomicState provides immediate write-through semantics, but for testing
+     * purposes we treat them as the same object.
+     */
+    @CompileStatic
+    Map getAtomicState() {
+        return getState()
     }
 
     private Object parent
+    private PropertyAssignableMap cachedStateMap = null
 
     @CompileStatic
     void initialize(DeviceExecutor api, DeviceValidator validator, Map userSettingValues, Closure customizeScriptBeforeRun)
@@ -65,10 +91,35 @@ abstract class HubitatDeviceScript extends Script
         api = this.metadataReader
 
         this.api = api
+        rebindStateAfterApiInitialization()
 
         this.userSettingsMap = this.metadataReader.settings
 
         this.validator = validator
+    }
+
+    /**
+     * If state was accessed before api wiring completed, migrate early writes from
+     * internal fallback state into executor-backed state and clear cached wrapper.
+     */
+    @CompileStatic
+    private void rebindStateAfterApiInitialization() {
+        Map executorState = null
+        try {
+            executorState = this.@api?.getState()
+        } catch (Throwable ignored) {
+            executorState = null
+        }
+
+        if (executorState != null) {
+            if (this.@internalState != null && !this.@internalState.is(executorState)) {
+                executorState.putAll(this.@internalState)
+            }
+            this.@internalState = executorState
+        }
+
+        // Force next getState() call to wrap the latest backing store.
+        this.@cachedStateMap = null
     }
 
     /**
@@ -199,9 +250,17 @@ abstract class HubitatDeviceScript extends Script
     }
 
     private DeviceWrapper fallbackDevice = null
+    private PropertyAssignableMap cachedSettingsMap = null
 
     @CompileStatic
     Map getSettings() {
-        return this.@userSettingsMap
+        if (this.@cachedSettingsMap != null) {
+            return this.@cachedSettingsMap
+        }
+        if (this.@userSettingsMap != null) {
+            this.@cachedSettingsMap = new PropertyAssignableMap(this.@userSettingsMap)
+            return this.@cachedSettingsMap
+        }
+        return null
     }
 }

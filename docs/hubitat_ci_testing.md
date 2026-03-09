@@ -66,6 +66,35 @@ def script = new HubitatDeviceSandbox(new File("device_script.groovy")).run(
 )
 ```
 
+For integration specs based on `IntegrationDeviceSpecification`, prefer the built-in stub helpers instead of direct
+`script.metaClass...` assignments:
+```groovy
+initializeEnvironment(
+    deviceScriptFilename: "Scripts/Devices/MyDriver.groovy",
+    scriptStubs: [
+        httpGet: { Map args, Closure cb -> cb([status: 200, data: [ok: true]]) },
+        _time_utcNow: { -> java.time.OffsetDateTime.parse("2026-01-01T00:00:00Z") }
+    ]
+)
+```
+
+You can also register stubs after initialization:
+```groovy
+registerScriptStub("refresh") { -> "stubbed" }
+```
+
+## State and settings semantics (integration harness)
+In integration tests, `state`/`settings` support both map-style and property-style access:
+```groovy
+state.myLowPriceStart = "2026-03-10T00:00:00"
+state["myLowPriceStart"] = "2026-03-10T00:00:00"
+settings.enableDebugLogging = true
+settings["enableDebugLogging"] = true
+```
+
+`device.updateSetting("name", [value: "...", type: "..."])` is supported in `IntegrationDeviceWrapper`, including
+typed bool maps such as `[value: "true", type: "bool"]`.
+
 ## Deterministic time
 `new Date()` is rewritten to `TimeKeeper.now()`. For time-sensitive tests, stub `TimeKeeper.now = { fixedInstant }` within the test JVM (restore afterward) or inject time into your code paths.
 

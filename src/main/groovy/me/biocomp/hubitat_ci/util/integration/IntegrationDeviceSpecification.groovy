@@ -49,12 +49,64 @@ abstract class IntegrationDeviceSpecification extends Specification {
 
         sandbox = new HubitatDeviceSandbox(new File(options.deviceScriptFilename))
         deviceScript = sandbox.run(api: deviceExecutor, validationFlags: options.validationFlags, userSettingValues: options.userSettingValues)
+        device.bindSettingsMap(deviceScript.getSettings())
+        registerScriptStubs(options.scriptStubs as Map<String, Closure>)
         deviceExecutor.setSubscribingScript(deviceScript)
+    }
+
+    /**
+     * Register one method stub on the loaded device script.
+     * This is the integration-test friendly alternative to {@code script.metaClass.foo = { ... }}.
+     */
+    protected void registerScriptStub(String methodName, Closure stub) {
+        assert deviceScript != null: "initializeEnvironment(...) must be called before registering script stubs."
+        assert methodName: "methodName must not be null or empty."
+        assert stub != null: "stub closure must not be null."
+
+        deviceScript.getMetaClass()."$methodName" = stub
+
+        registerExecutorStub(methodName, stub)
+        registerExecutorMetaClassStub(methodName, stub)
+    }
+
+    // Many Hubitat APIs (httpGet/httpPost/now/etc) are implemented by the executor delegate.
+    // Registering directly keeps integration test stubbing consistent for both script and API calls.
+    private void registerExecutorStub(String methodName, Closure stub) {
+        try {
+            deviceExecutor?.registerMethodStub(methodName, stub)
+        } catch (MissingMethodException ignored) {
+            // Backward compatibility for executors without registerMethodStub.
+        } catch (Throwable ignored) {
+            // Best effort only.
+        }
+    }
+
+    // Mirror on executor metaclass for helper calls resolved there.
+    private void registerExecutorMetaClassStub(String methodName, Closure stub) {
+        try {
+            deviceExecutor?.getMetaClass()."$methodName" = stub
+        } catch (Throwable ignored) {
+            // Best effort only. Helper methods usually live on the script itself.
+        }
+    }
+
+    /**
+     * Register multiple script method stubs.
+     */
+    protected void registerScriptStubs(Map<String, Closure> scriptStubs) {
+        if (scriptStubs == null) {
+            return
+        }
+
+        scriptStubs.each { String methodName, Closure stub ->
+            registerScriptStub(methodName, stub)
+        }
     }
 
     private static void validateAndUpdateOptions(Map options) {
         options.putIfAbsent('validationFlags', [])
         options.putIfAbsent('userSettingValues', [])
+        options.putIfAbsent('scriptStubs', [:])
         optionsValidator.validate("Validating IntegrationAppSpecification options", options, EnumSet.noneOf(Flags))
     }
 
@@ -62,6 +114,7 @@ abstract class IntegrationDeviceSpecification extends Specification {
         objParameter("deviceScriptFilename", required(), mustNotBeNull(), { v -> new Tuple2("String", v instanceof String)} )
         objParameter("validationFlags", notRequired(), mustNotBeNull(), { v -> new Tuple2("List<Flags>", v as List<Flags>) })
         objParameter("userSettingValues", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Object>", v as Map<String, Object>) })
+        objParameter("scriptStubs", notRequired(), mustNotBeNull(), { v -> new Tuple2("Map<String, Closure>", v as Map<String, Closure>) })
     }
 
     /**

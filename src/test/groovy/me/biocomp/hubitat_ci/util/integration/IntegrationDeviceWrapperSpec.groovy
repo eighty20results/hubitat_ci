@@ -161,5 +161,30 @@ class IntegrationDeviceWrapperSpec extends Specification {
         then:
             wrapper.currentValue('flag', false) == true
     }
-}
 
+    def "updateSetting(Map) unwraps typed bool values and updates getSetting()"() {
+        given:
+            Map settings = [:]
+            wrapper.bindSettingsMap(settings)
+
+        when:
+            wrapper.updateSetting('enableDebugLogging', [value: 'true', type: 'bool'])
+
+        then:
+            wrapper.getSetting('enableDebugLogging') == true
+            settings.enableDebugLogging == true
+    }
+
+    def "updateSetting(Map) with no typed payload stores original map"() {
+        given:
+            Map settings = [:]
+            wrapper.bindSettingsMap(settings)
+
+        when:
+            wrapper.updateSetting('rawSetting', [foo: 'bar'])
+
+        then:
+            wrapper.getSetting('rawSetting') == [foo: 'bar']
+            settings.rawSetting == [foo: 'bar']
+    }
+}
