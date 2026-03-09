@@ -108,7 +108,7 @@ abstract class InputCommon {
         def unique = new HashSet<String>()
         source.each {
             def stringVal = it.toString()
-            def lowerVal = stringVal.toLowerCase()
+            def lowerVal = stringVal.toLowerCase(Locale.ROOT)
 
             assert !unique.contains(lowerVal): "${this}: enum ${keyOrValue} '${it}' was duplicated"
 

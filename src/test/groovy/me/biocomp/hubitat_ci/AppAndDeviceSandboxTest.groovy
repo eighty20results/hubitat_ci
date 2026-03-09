@@ -741,4 +741,25 @@ def readProperty()
                     ["['1':'Max', '2':'High', '3':'Default', '4':'Low', '5':'Min']", "'high'"]])
             // @formatter:on
         }
+
+        @Unroll
+        def "#sandboxClass.simpleName: Enum default value matching is case-insensitive (#options with #defaultValue)"(
+                String options, String defaultValue, Class sandboxClass)
+        {
+            expect:
+                parseInput(sandboxClass, 'enum', "defaultValue: ${defaultValue}, options: ${options}")
+
+            where:
+                // @formatter:off
+            [options, defaultValue, sandboxClass] << combineWithSandboxes(
+                    [["['Max', 'High', 'Default', 'Low', 'Min']", "'default'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'max'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'DEFAULT'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'LOW'"],
+                    ["['Max', 'High', 'Default', 'Low', 'Min']",  "'min'"],
+                    ["[1:'Max', 2:'High', 3:'Default', 4:'Low', 5:'Min']", "'default'"],
+                    ["[1:'Max', 2:'High', 3:'Default', 4:'Low', 5:'Min']", "'max'"],
+                    ["['1':'Max', '2':'High', '3':'Default', '4':'Low', '5':'Min']", "'high'"]])
+            // @formatter:on
+        }
     }
